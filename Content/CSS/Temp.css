@@ -1,0 +1,302 @@
+﻿.card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+/*Toasters Template*/
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    min-width: 250px;
+    animation: slideIn .3s ease;
+    position: relative;
+}
+
+.toast-demo {
+    margin: 30px;
+}
+
+    .toast-demo button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #333;
+        cursor: pointer;
+        margin-right: 6px;
+        font-weight: 500;
+    }
+
+
+.toast-default {
+    background: #333;
+}
+
+.toast-success {
+    background: #0f766e;
+}
+
+.toast-error {
+    background: #dc2626;
+}
+
+.toast-warning {
+    background: #f59e0b;
+}
+
+.toast-info {
+    background: #06b6d4;
+}
+
+.toast-loading {
+    background: #111;
+}
+
+.toast-close {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: rgba(255,255,255,0.4);
+    animation: progress 3s linear forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes progress {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+/*Sweetalert Template*/
+
+.alert-demo {
+    margin: 30px;
+}
+
+    .alert-demo button {
+        margin-right: 8px;
+    }
+
+/* Card Template */
+
+.farm-card {
+    width: 300px;
+    height: 55vh;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin: auto;
+}
+
+    /* Hover effect */
+    .farm-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    }
+
+/* Image placeholder */
+
+.card-image-placeholder {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    color: #bbb;
+    font-size: 40px;
+}
+
+/* Body */
+
+.card-body {
+    padding: 15px;
+}
+
+    .card-body h3 {
+        font-size: 17px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .card-body p {
+        color: #777;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+/* Footer */
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    /* Price */
+
+    .card-footer span {
+        font-weight: 600;
+    }
+
+    /* Button */
+
+    .card-footer button {
+        border: 1px solid #1F4D3A;
+        background: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .card-footer button:hover {
+            background: #1F4D3A;
+            color: white;
+        }
+/*Datatable template*/
+/* ===== DataTable UI Styling ===== */
+
+#multi_col_order {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    #multi_col_order thead th {
+        background: linear-gradient(90deg,#1f3b63,#2f5d9a);
+        color: white;
+        font-size: 15px;
+    }
+
+    #multi_col_order tbody tr:hover {
+        background: #f4f7fb;
+        transition: 0.2s;
+    }
+
+#dataTable tbody td {
+    font-size: 14px;
+    padding: 10px !important;
+}
+
+/* Table Borders */
+.dataTable th,
+.dataTable td {
+    border: 1px solid #ddd !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Buttons styling */
+.dt-button {
+    background: #1f3b63 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 15px !important;
+    margin-right: 5px !important;
+    font-size: 14px !important;
+}
+
+    .dt-button:hover {
+        background: #0f2f57 !important;
+    }
+
+/* Search & dropdown */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left;
+    margin-bottom: 15px;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    margin-bottom: 15px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 6px !important;
+    margin: 3px;
+    padding: 6px 12px;
+    border: 1px solid #ddd !important;
+}
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #1f3b63 !important;
+        color: white !important;
+    }
+/*Datepicker css*/
+.datepicker-dropdown {
+    z-index: 9999 !important;
+}
+
+.date-input {
+    padding-right: 35px;
+}
+
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #000 !important;
+    font-size: 16px;
+}
+/*Search bar css*/
+.search-wrapper .input-group {
+    transition: all 0.3s ease;
+}
+
+    .search-wrapper .input-group:focus-within {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 0 0 3px rgba(66,133,244,0.25);
+        transform: translateY(-1px);
+    }
+
+.search-wrapper .form-control:focus {
+    box-shadow: none;
+}
+
+.search-wrapper input::placeholder {
+    color: #9aa0a6;
+}

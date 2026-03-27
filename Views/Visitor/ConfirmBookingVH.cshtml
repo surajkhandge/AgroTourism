@@ -1,4 +1,4 @@
-﻿@model AgroClassLib.Visitor.ConfirmBookingVH
+﻿@model AgroClassLib.Visitor.ConfirmBookingVM
 
 @{
     ViewBag.Title = "Confirm Booking";
@@ -157,12 +157,200 @@ new { id = Model.FarmHouseCode })"
 
             </a>
 
-            <button class="btn btn-success">
+            <a id="payBtn" class="btn btn-outline-success btn-rounded px-4" onclick="startPayment()">
+                <i class="fas fa-check"></i>
                 Confirm Booking
-            </button>
+            </a>
 
         </div>
 
     </div>
 
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+function showLoading(title, message) {
+    title = title || 'Processing';
+    message = message || 'Please wait';
+    Swal.fire({
+        html: `
+            <div style="display:flex;flex-direction:column;align-items:center;padding:25px;">
+                <div style="width:50px;height:50px;border-radius:50%;border:5px solid #25b09b;border-top-color:transparent;animation:spin 1s linear infinite;"></div>
+                <div style="font-size:20px;font-weight:600;color:#1b4332;margin-top:15px;">${title}</div>
+                <div style="color:#666;font-size:14px;">${message}</div>
+            </div>
+            <style>@@keyframes spin{to{transform:rotate(360deg)}}</style>
+        `,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        background: '#ffffff',
+        width: 400,
+        padding: 0,
+        customClass: { popup: 'modern-popup' }
+    });
+}
+
+
+    var bookingData = {
+        FarmHouseName: '@Model.FarmHouseName',
+        FarmHouseCode: '@Model.FarmHouseCode',
+        CheckinDate: '@Model.CheckIn.ToString("yyyy-MM-dd")',
+        CheckoutDate: '@Model.CheckOut.ToString("yyyy-MM-dd")',
+        NoOfGuest: @Model.NoOfGuest,
+        TotalAmount: @(Model.IsPackageBooking ? Model.FinalPrice : Model.TotalCost),
+
+    };
+    async function startPayment() {
+        var btn = document.getElementById("payBtn");
+        btn.disabled = true;
+
+        showLoading("Preparing Payment", "Connecting to Gateway");
+
+        try {
+
+            const sessionRes = await fetch('/Visitor/PreparePaymentSession', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+
+            const sessionResult = await sessionRes.json();
+
+            if (!sessionResult.success) {
+                Swal.close();
+                throw new Error("Session setup failed");
+            }
+
+            const orderRes = await fetch('/Visitor/CreateOrderST', { method: 'POST' });
+
+            if (!orderRes.ok) throw new Error("Order creation failed");
+
+            const data = await orderRes.json();
+
+            Swal.close();
+
+            var options = {
+
+                key: "rzp_test_SKJffluQb0FxhL",
+
+                amount: data.Amount,
+
+                currency: "INR",
+
+                order_id: data.OrderId,
+
+                method: {
+                    upi: true,
+                    card: true,
+                    netbanking: true,
+                    wallet: false,
+                    emi: false,
+                    paylater: false
+                },
+
+                prefill: {
+                    name: "Test User",
+                    email: "test@test.com",
+                    contact: "9123456789"
+                },
+
+                handler: function (response) {
+                    //console.log(response);
+                    showLoading("Verifying Payment", "Please Wait");
+
+                    fetch('/Visitor/VerifyPaymentST', {
+
+                        method: 'POST',
+
+                        headers: { 'Content-Type': 'application/json' },
+
+                        body: JSON.stringify({
+                            RazorpayOrderId: response.razorpay_order_id,
+                            RazorpayPaymentId: response.razorpay_payment_id,
+                            RazorpaySignature: response.razorpay_signature
+                        })
+
+                    })
+
+                        .then(function (res) {
+                            if (!res.ok) throw new Error("Verfication failed");
+                            return res.json();
+                        })
+
+                        .then(function (result) {
+
+                            Swal.close();
+
+                            if (result.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful',
+                                    text: 'Your booking has been confirmed Thank you for choosing us',
+                                    confirmButtonColor: '#1b4332'
+                                }).then(function () {
+                                    window.location.href = "/Visitor/PaymentSuccessST"
+                                });
+                            }
+                            else {
+                                btn.disabled = false;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Failed',
+                                    text: 'Your payment could not be verified.',
+                                    confirmButtonText: 'Try again'
+                                });
+                            }
+                        })
+                        .catch(function () {
+                            Swal.close();
+                            btn.disabled = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Verification Error',
+                                text: 'Something went wrong during verification. Contact support.'
+                            });
+                        });
+                },
+
+                modal: {
+                    ondismiss: function () {
+                        btn.disabled = false;
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Payment Cancelled',
+                            text: 'You closed the payment window.'
+                        });
+                    }
+
+                }
+            };
+
+            var rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', function (response) {
+                btn.disabled = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Failed',
+                    text: response.error.description || 'Payment was not completed.'
+                });
+            });
+
+            rzp.open();
+
+        } catch (error) {
+
+            Swal.close();
+            btn.disabled = false;
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Something Went Wrong',
+                text: error.message|| 'Unable to initiate payment'
+            });
+        }
+    }
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

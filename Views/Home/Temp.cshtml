@@ -1,0 +1,807 @@
+﻿
+@{
+    ViewBag.Title = "Temp";
+    //Layout = "~/Views/Shared/Visitor.cshtml";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - AgroTrip India</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" />
+
+    <!-- Datepicker -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- SweetAlert -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link href="~/Content/CSS/Temp.css" rel="stylesheet" />
+    @Styles.Render("~/Content/CSS/Visitor.css")
+
+</head>
+
+<body>
+    <div class="card mb-3">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-2">
+                    <label>Destination</label>
+                    <input type="text" class="form-control" placeholder="Where to?">
+                </div>
+
+                <div class="col-md-2">
+                    <label>Check-in</label>
+                    <div class="position-relative">
+                        <input type="text"
+                               id="checkinDate"
+                               class="form-control date-input"
+                               placeholder="dd-mm-yyyy">
+                        <i class="fa fa-calendar calendar-icon"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label>Check-out</label>
+                    <div class="position-relative">
+                        <input type="text"
+                               id="checkoutDate"
+                               class="form-control date-input"
+                               placeholder="dd-mm-yyyy">
+                        <i class="fa fa-calendar calendar-icon"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">
+                        <i class="fa fa-search"></i> Search
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h1><strong>Use This Toaster</strong></h1>
+            <div class="toast-demo">
+
+                <button onclick="showToast('This is a Normal Toast','default')" class="btn btn-secondary btn-rounded">default</button>
+
+                <button onclick="showToast('Success Toast','success')" class="btn btn-success btn-rounded">success</button>
+
+                <button onclick="showToast('Error Toast','error')" class="btn btn-danger btn-rounded">error</button>
+
+                <button onclick="showToast('Warning Toast','warning')" class="btn btn-warning btn-rounded">warning</button>
+
+                <button onclick="showToast('Information Toast','info')" class="btn btn-info btn-rounded">info</button>
+
+                <button onclick="showToast('Loading Toast','loading')" class="btn btn-dark btn-rounded">loading</button>
+
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h1><strong>Use This SweetAlerts</strong></h1>
+            <div class="alert-demo mt-4">
+
+                <button class="btn btn-secondary" onclick="showAlert('default')">default</button>
+
+                <button class="btn btn-success" onclick="showAlert('success')">success</button>
+
+                <button class="btn btn-danger" onclick="showAlert('error')">error</button>
+
+                <button class="btn btn-warning" onclick="showAlert('warning')">warning</button>
+
+                <button class="btn btn-info" onclick="showAlert('info')">info</button>
+
+                <button class="btn btn-dark" onclick="showAlert('loading')">loading</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+
+
+    @*filter*@
+
+    <div class="card mb-3">
+        <div class="card-body">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- Search -->
+                <div class="col-md-2">
+                    <label>Search</label>
+                    <input type="text"
+                           id="tableSearch"
+                           class="form-control"
+                           placeholder="Search...">
+                </div>
+
+                <!-- Farm Type -->
+                <div class="col-md-2">
+                    <label>Farm Type</label>
+                    <select class="form-select" id="farmTypeFilter">
+                        <option value="">All</option>
+                        <option value="Company">Company</option>
+                        <option value="Personal Ownership">Personal Ownership</option>
+                        <option value="Partnership">Partnership</option>
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-2">
+                    <label>Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Refunded">Refunded</option>
+                    </select>
+                </div>
+
+                <!-- From Date -->
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input type="date" class="form-control" id="fromDate">
+                </div>
+
+                <!-- To Date -->
+                <div class="col-md-2">
+                    <label>To Date</label>
+                    <input type="date" class="form-control" id="toDate">
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <div class="d-flex gap-2">
+
+                        <button id="excelBtn" class="btn btn-outline-success">
+                            <i class="fa fa-file-excel"></i>
+                        </button>
+
+                        <button id="pdfBtn" class="btn btn-outline-danger">
+                            <i class="fa fa-file-pdf"></i>
+                        </button>
+
+                        <button id="refreshBtn" class="btn btn-outline-primary">
+                            <i class="fa fa-rotate-right"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h1><strong>Use This Buttons</strong></h1>
+            <!-- Buttons for forms -->
+            <!-- Save button -->
+            <button type="button" class="btn btn-outline-success btn-rounded">
+                <i class="fas fa-check"></i> Save
+            </button>
+            <!-- Submit button -->
+            <button type="button" class="btn btn-outline-success btn-rounded">
+                <i class="fas fa-check"></i> Submit
+            </button>
+            <!-- Edit Button -->
+            <button type="button" class="btn btn-outline-primary btn-rounded">
+                <i class="fa fa-pencil"></i> Edit
+            </button>
+            <!-- Update Button -->
+            <button type="button" class="btn btn-outline-primary btn-rounded">
+                <i class="fa fa-pencil"></i> Update
+            </button>
+            <!-- Delete Button -->
+            <button type="button" class="btn btn-outline-danger btn-rounded">
+                <i class="fa fa-trash"></i> Delete
+            </button>
+            <!-- Cancel Button -->
+            <button type="button" class="btn btn-outline-danger btn-rounded">
+                <i class="fa fa-times"></i> Cancel
+            </button>
+            <!-- View Button -->
+            <button type="button" class="btn btn-outline-warning btn-rounded">
+                <i class="fa fa-eye"></i> View
+            </button>
+            <!-- PDF Button -->
+            <button type="button" class="btn btn-outline-danger btn-rounded">
+                <i class="fa fa-file-pdf"></i>
+            </button>
+            <!-- Export Button -->
+            <button type="button" class="btn btn-outline-success btn-rounded">
+                <i class="fa fa-file-excel"></i>
+            </button>
+            <!-- Mail Button -->
+            <button type="button" class="btn btn-outline-warning btn-rounded">
+                <i class="fa fa-envelope"></i>
+            </button>
+            <!-- Filter Delete Button -->
+            <button type="button" class="btn btn-outline-danger btn-rounded">
+                <i class="fa fa-trash"></i>
+            </button>
+            <!-- Previous Button -->
+            <button class="btn btn-outline-secondary btn-rounded">
+                <i class="fa fa-arrow-left"></i> Previous
+            </button>
+            <!-- Next Button -->
+            <button class="btn btn-outline-primary btn-rounded">
+                Next <i class="fa fa-arrow-right"></i>
+            </button>
+            <br>
+            <br>
+        </div>
+    </div>
+    <!-- Search Bar -->
+    <div class="search-wrapper w-25 mx-auto mt-4">
+        <div class="input-group input-group-lg rounded-pill bg-white shadow-sm">
+            <input type="search"
+                   class="form-control border-0 rounded-pill shadow-none ps-4"
+                   placeholder="Search">
+            <span class="input-group-text bg-white border-0 rounded-pill pe-4">
+                <i class="bi bi-search fs-5"></i>
+            </span>
+        </div>
+    </div>
+    <br />
+
+    <div class="farm-card">
+
+        <div class="card-image-placeholder">
+            <i class="fa fa-image"></i>
+        </div>
+
+        <div class="card-body">
+
+            <h3>Lotus Green Farm</h3>
+
+            <p>Pune</p>
+
+            <div class="card-footer">
+                <span>₹1800 / night</span>
+
+                <button>View Details</button>
+            </div>
+
+        </div>
+
+    </div>
+    <br />
+    <!-- Table -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-subtitle">
+                    Use This Datatable For your Task
+                </h6>
+                <br />
+                <div class="table-responsive">
+                    <table id="multi_col_order"
+                           class="table table-striped table-bordered dataTable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>Sr No</th>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>Position</th>
+                                <th>Office</th>
+                                <th>Salary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Tiger</td>
+                                <td>Nixon</td>
+                                <td>System Architect</td>
+                                <td>Edinburgh</td>
+                                <td>$320,800</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Garrett</td>
+                                <td>Winters</td>
+                                <td>Accountant</td>
+                                <td>Tokyo</td>
+                                <td>$170,750</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Ashton</td>
+                                <td>Cox</td>
+                                <td>Junior Technical Author</td>
+                                <td>San Francisco</td>
+                                <td>$86,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Cedric</td>
+                                <td>Kelly</td>
+                                <td>Senior Javascript Developer</td>
+                                <td>Edinburgh</td>
+                                <td>$433,060</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Airi</td>
+                                <td>Satou</td>
+                                <td>Accountant</td>
+                                <td>Tokyo</td>
+                                <td>$162,700</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Brielle</td>
+                                <td>Williamson</td>
+                                <td>Integration Specialist</td>
+                                <td>New York</td>
+                                <td>$372,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Herrod</td>
+                                <td>Chandler</td>
+                                <td>Sales Assistant</td>
+                                <td>San Francisco</td>
+                                <td>$137,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Rhona</td>
+                                <td>Davidson</td>
+                                <td>Integration Specialist</td>
+                                <td>Tokyo</td>
+                                <td>$327,900</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Colleen</td>
+                                <td>Hurst</td>
+                                <td>Javascript Developer</td>
+                                <td>San Francisco</td>
+                                <td>$205,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Sonya</td>
+                                <td>Frost</td>
+                                <td>Software Engineer</td>
+                                <td>Edinburgh</td>
+                                <td>$103,600</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Jena</td>
+                                <td>Gaines</td>
+                                <td>Office Manager</td>
+                                <td>London</td>
+                                <td>$90,560</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Quinn</td>
+                                <td>Flynn</td>
+                                <td>Support Lead</td>
+                                <td>Edinburgh</td>
+                                <td>$342,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Charde</td>
+                                <td>Marshall</td>
+                                <td>Regional Director</td>
+                                <td>San Francisco</td>
+                                <td>$470,600</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Haley</td>
+                                <td>Kennedy</td>
+                                <td>Senior Marketing Designer</td>
+                                <td>London</td>
+                                <td>$313,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Tatyana</td>
+                                <td>Fitzpatrick</td>
+                                <td>Regional Director</td>
+                                <td>London</td>
+                                <td>$385,750</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Michael</td>
+                                <td>Silva</td>
+                                <td>Marketing Designer</td>
+                                <td>London</td>
+                                <td>$198,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Paul</td>
+                                <td>Byrd</td>
+                                <td>Chief Financial Officer (CFO)</td>
+                                <td>New York</td>
+                                <td>$725,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Gloria</td>
+                                <td>Little</td>
+                                <td>Systems Administrator</td>
+                                <td>New York</td>
+                                <td>$237,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Bradley</td>
+                                <td>Greer</td>
+                                <td>Software Engineer</td>
+                                <td>London</td>
+                                <td>$132,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Dai</td>
+                                <td>Rios</td>
+                                <td>Personnel Lead</td>
+                                <td>Edinburgh</td>
+                                <td>$217,500</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Jenette</td>
+                                <td>Caldwell</td>
+                                <td>Development Lead</td>
+                                <td>New York</td>
+                                <td>$345,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Yuri</td>
+                                <td>Berry</td>
+                                <td>Chief Marketing Officer (CMO)</td>
+                                <td>New York</td>
+                                <td>$675,000</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Caesar</td>
+                                <td>Vance</td>
+                                <td>Pre-Sales Support</td>
+                                <td>New York</td>
+                                <td>$106,450</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Doris</td>
+                                <td>Wilder</td>
+                                <td>Sales Assistant</td>
+                                <td>Sidney</td>
+                                <td>$85,600</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="rowCheck"></td>
+                                <td></td>
+                                <td>Angelica</td>
+                                <td>Ramos</td>
+                                <td>Chief Executive Officer (CEO)</td>
+                                <td>London</td>
+                                <td>$1,200,000</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="date-filter">
+
+        <label>Date range picker</label>
+
+        <input type="text"
+               id="dateRange"
+               class="form-control"
+               placeholder="Select Date Range" />
+
+        <input type="hidden" id="startDate" />
+        <input type="hidden" id="endDate" />
+
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#checkinDate').datepicker({
+                format: 'dd-mm-yyyy',
+                autoHide: true
+            });
+
+            $('#checkoutDate').datepicker({
+                format: 'dd-mm-yyyy',
+                autoHide: true
+            });
+
+        });
+
+        function showToast(message, type = "default") {
+
+            let container = document.getElementById("toastContainer");
+
+            let toast = document.createElement("div");
+
+            toast.className = "custom-toast toast-" + type;
+
+            let icon = "fa-circle-info";
+
+            if (type === "success") icon = "fa-circle-check";
+            if (type === "error") icon = "fa-circle-xmark";
+            if (type === "warning") icon = "fa-triangle-exclamation";
+            if (type === "info") icon = "fa-circle-info";
+            if (type === "loading") icon = "fa-spinner fa-spin";
+
+            toast.innerHTML = `
+
+<span class="toast-icon">
+<i class="fa-solid ${icon}"></i>
+</span>
+
+<span>${message}</span>
+
+<span class="toast-close">
+<i class="fa-solid fa-xmark"></i>
+</span>
+
+<div class="toast-progress"></div>
+
+`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+
+            toast.querySelector(".toast-close").onclick = function () {
+                toast.remove();
+            }
+
+        }
+
+    </script>
+
+    <script>
+
+        function showAlert(type) {
+
+            if (type === "default") {
+
+                Swal.fire({
+                    title: "Hello!",
+                    text: "This is a normal alert",
+                    icon: "question"
+                });
+
+            }
+
+            if (type === "success") {
+
+                Swal.fire({
+                    title: "Success!",
+                    text: "Operation completed successfully",
+                    icon: "success",
+                    confirmButtonColor: "#198754"
+                });
+
+            }
+
+            if (type === "error") {
+
+                Swal.fire({
+                    title: "Error!",
+                    text: "Something went wrong",
+                    icon: "error",
+                    confirmButtonColor: "#dc3545"
+                });
+
+            }
+
+            if (type === "warning") {
+
+                Swal.fire({
+                    title: "Warning!",
+                    text: "Please check your input",
+                    icon: "warning",
+                    confirmButtonColor: "#f59e0b"
+                });
+
+            }
+
+            if (type === "info") {
+
+                Swal.fire({
+                    title: "Information",
+                    text: "Here is some information",
+                    icon: "info",
+                    confirmButtonColor: "#0dcaf0"
+                });
+
+            }
+
+            if (type === "loading") {
+
+                Swal.fire({
+                    title: "Loading...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
+                setTimeout(() => {
+                    Swal.close()
+                }, 2000);
+
+            }
+
+        }
+
+    </script>
+
+    <script>
+
+
+
+        //// SEARCH
+        //$('#tableSearch').keyup(function () {
+        //    table.search($(this).val()).draw();
+        //});
+
+
+        // FARM TYPE
+        $('#farmTypeFilter').change(function () {
+            table.column(4).search($(this).val()).draw();
+        });
+
+
+        // STATUS
+        $('#statusFilter').change(function () {
+            table.column(8).search($(this).val()).draw();
+        });
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            var table = $('#multi_col_order').DataTable({
+
+                pageLength: 10,
+
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+
+                ordering: false,
+
+                responsive: true,
+
+                lengthChange: true,
+                //searching: false,
+                language: {
+                    //search: "",
+                    //searchPlaceholder: "Search...",
+                    paginate: {
+                        previous: '<i class="fa fa-chevron-left"></i>',
+                        next: '<i class="fa fa-chevron-right"></i>'
+                    }
+                },
+
+                columnDefs: [
+                    { orderable: false, targets: [0, 1] }
+                ]
+
+            });
+
+
+            // SERIAL NUMBER
+            table.on('draw.dt', function () {
+
+                var pageInfo = table.page.info();
+
+                table.column(1, { page: 'current' }).nodes().each(function (cell, i) {
+
+                    cell.innerHTML = pageInfo.start + i + 1;
+
+                });
+
+            });
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+@*@RenderSection("scripts", required: false)*@
+
+

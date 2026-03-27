@@ -1,0 +1,260 @@
+﻿@{
+    ViewBag.title = "Payment";
+}
+<style>
+
+    .modern-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 25px;
+    }
+
+    .loader-ring {
+        width: 50px;
+        padding: 8px;
+        aspect-ratio: 1;
+        background: #25b09b;
+        --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
+        -webkit-mask: var(--_m);
+        mask: var(--_m);
+        -webkit-mask-composite: source-out;
+        mask-composite: subtract;
+        animation: l3 1s infinite linear;
+    }
+
+    @@keyframes l3 {
+        to {
+            transform: rotate(1turn);
+        }
+    }
+
+    .loader-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #1b4332;
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+
+    .loader-text {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .dots::after {
+        content: "";
+        animation: dots 1.5s infinite
+    }
+
+    @@keyframes dots {
+        0% {
+            content: ""
+        }
+
+        25% {
+            content: "."
+        }
+
+        50% {
+            content: ".."
+        }
+
+        75% {
+            content: "..."
+        }
+
+        100% {
+            content: ""
+        }
+    }
+
+    .modern-popup {
+        border-radius: 18px !important;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+        padding: 0 !important;
+    }
+
+        .modern-popup .swal2-html-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+</style>
+
+<button type="button" id="payBtn" onclick="startPayment()">Pay now</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    function showLoading(title, message) {
+        title = title || 'Processing';
+        message = message || 'Please Wait';
+        Swal.fire({
+            title: '',
+            html: `
+                <div class="modern-loader">
+                    <div class="loader-ring"></div>
+                    <div class="loader-title">
+                        ${title}
+                    </div>
+
+                    <div class="loader-text">
+                        ${message}
+                        <span class="dots"></span>
+                    </div>
+                </div>
+                `,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            background: "#ffffff",
+            width: 400,
+            padding: 0,
+            customClass: {popup: 'modern-popup'}
+        });
+    }
+    function startPayment() {
+        var btn = document.getElementById("payBtn");
+        btn.disabled = true;
+
+        showLoading("Preparing Payment", "Conneting to Gateway");
+
+        fetch('/Visitor/CreateOrderST', {method: 'POST'})
+            .then(function (response) {
+                if (!response.ok) throw new Error("Order creation failed");
+                return response.json();
+            })
+            .then(function(data) {
+
+                Swal.close();
+
+                var options = {
+
+                    key: "rzp_test_SKJffluQb0FxhL",
+
+                    amount: data.Amount,
+
+                    currency: "INR",
+
+                    order_id: data.OrderId,
+
+                    method: {
+                        upi: true,
+                        card: true,
+                        netbanking: true,
+                        wallet: false,
+                        emi: false,
+                        paylater: false
+                    },
+
+                    prefill: {
+                        name: "Test User",
+                        email: "test@test.com",
+                        contact: "9123456789"
+                    },
+
+                    handler: function (response) {
+                        //console.log(response);
+                        showLoading("Verifying Payment", "Please Wait");
+
+                        fetch('/Visitor/VerifyPaymentST', {
+
+                            method: 'POST',
+
+                            headers: { 'Content-Type': 'application/json' },
+
+                            body: JSON.stringify({
+                                RazorpayOrderId: response.razorpay_order_id,
+                                RazorpayPaymentId: response.razorpay_payment_id,
+                                RazorpaySignature: response.razorpay_signature
+                            })
+
+                        })
+
+                            .then(function (res)
+                            {
+                                if (!res.ok) throw new Error("Verfication failed");
+                                return res.json();
+                            })
+
+                            .then(function(result) {
+
+                                Swal.close();
+
+                                if (result.success) {
+                                    //alert("Payment Successful");
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Payment Successful',
+                                        text: 'Your booking has been confirmed Thank you for choosing us',
+                                        confirmButtonColor: '#1b4332'
+                                    }).then(function() {
+                                        window.location.href = "/Visitor/PaymentSuccessST"
+                                    });
+                                }
+                                else {
+                                    btn.disabled = false;
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Payment Failed',
+                                        text: 'Your payment could not be verified.',
+                                        confirmButtonText: 'Try again'
+                                    });
+                                }
+                            })
+                            .catch(function () {
+                                Swal.close();
+                                btn.disabled = false;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Verification Error',
+                                    text: 'Something went wrong during verification. Contact support.'
+                                });
+                            });
+                },
+
+                    modal: {
+                        ondismiss: function () {
+                            btn.disabled = false;
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Payment Cancelled',
+                                text: 'You closed the payment window.'
+                            });
+                        }
+
+                    }
+                };
+
+                var rzp = new Razorpay(options);
+
+                rzp.on('payment.failed', function (response) {
+                    btn.disabled = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: response.error.description || 'Payment was not completed.'
+                    });
+                });
+
+                rzp.open();
+            })
+            .catch(error => {
+                Swal.close();
+                btn.disabled = false;
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Something Went Wrong',
+                    text: 'Unable to initiate payment'
+                });
+            });
+
+    }
+
+
+</script>

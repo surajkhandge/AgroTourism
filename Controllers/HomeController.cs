@@ -16,7 +16,10 @@ namespace GSTAgroTourism.Controllers
 {
     public class HomeController : Controller
     {
-
+        public ActionResult Temp()
+        {
+            return View();
+        }
 
     }
 }

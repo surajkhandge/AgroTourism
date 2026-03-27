@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using AgroClassLib.Visitor;
+using Razorpay.Api;
+using Rotativa;
 using Twilio;
 using Twilio.Rest.Verify.V2.Service;
 
@@ -156,6 +158,8 @@ namespace GSTAgroTourism.Controllers
             model.DiscountPercent = data.DiscountPercent;
             model.DiscountAmount = data.DiscountAmount;
             model.FinalPrice = data.TotalPrice;
+            model.NoOfGuest = data?.NoOfGuest ?? 0;
+            System.Diagnostics.Debug.WriteLine("NoOfGuest from data: " + data.NoOfGuest);
 
             /* Dates */
             model.CheckIn = Convert.ToDateTime(checkIn);
@@ -295,7 +299,6 @@ namespace GSTAgroTourism.Controllers
         }
 
         // ---------------------------------For Visitor Profile--------------------------------
-
         public async Task<ActionResult> VisitorProfileAA(bool isEdit = false)
         {
             string visitorCode = Session["VisitorCode"].ToString();
@@ -504,7 +507,7 @@ namespace GSTAgroTourism.Controllers
                 model.PackagePrice;
                 model.ActivityTotal = 0;
                 model.FoodTotal = 0;
-                model.TotalGuests = 4; // or package capacity
+                model.TotalGuests = 4;
 
             }
             else
@@ -642,6 +645,7 @@ namespace GSTAgroTourism.Controllers
         {
 
             ConfirmBookingVM model = new ConfirmBookingVM();
+            model.VisitorCode = Session["VisitorCode"]?.ToString();
 
             if (Session["PackageName"] != null)
             {
@@ -666,6 +670,8 @@ namespace GSTAgroTourism.Controllers
                 model.CheckIn = Convert.ToDateTime(checkIn);
                 model.Nights = nights;
                 model.CheckOut = model.CheckIn.AddDays(nights);
+                model.NoOfGuest = data?.NoOfGuest ?? 0;
+                model.PayableAmount = model.FinalPrice;
                 var allActivities = await objbalvisitor.GetPackageActivitiesSK(farmCode);
                 var codes = data.ActivityCode.Split(',');
                 model.Activities = allActivities.FindAll(a => codes.Contains(a.ActivityCode));
@@ -739,8 +745,10 @@ namespace GSTAgroTourism.Controllers
                 model.FoodTotal = foodtotal;
                 model.TotalCost = roomTotal + activityTotal + foodtotal;
                 model.IsPackageBooking = false;
+                model.NoOfGuest = totalGuests;
+                model.PayableAmount = model.TotalCost;
 
-                return View("ConfirmBookingSK", model);
+                return View("ConfirmBookingVH", model);
 
             }
 
@@ -1063,6 +1071,205 @@ namespace GSTAgroTourism.Controllers
             }
         }
         #endregion
+
+        #region shubham
+
+        public VisitorController()
+        {
+            string key = ConfigurationManager.AppSettings["RazorpayKey"];
+            string secret = ConfigurationManager.AppSettings["RazorpaySecret"];
+
+            objbalvisitor = new BALVisitor(key, secret);
+        }
+        public ActionResult Index()
+        {
+            return View();
+        }
+        public ActionResult PaymentST()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> CreateOrderST()
+        {
+            decimal amount = Convert.ToDecimal(Session["TotalAmount"]);
+
+            string receipt = Guid.NewGuid().ToString();
+
+            string orderId = await objbalvisitor.CreatePaymentOrderAsyncST(amount, receipt);
+
+            return Json(new
+            {
+                OrderId = orderId,
+                Amount = amount
+            }
+                        );
+        }
+        [HttpPost]
+        public JsonResult PreparePaymentSession(Visitor model)
+        {
+            if (model == null)
+                return Json(new { success = false });
+            Session["FarmHouseName"] = model.FarmHouseName;
+            Session["VisitorCode"] = Session["VisitorCode"];
+            Session["FarmHouseCode"] = model.FarmHouseCode;
+            Session["CheckinDate"] = Convert.ToDateTime(model.CheckinDate);
+            Session["CheckoutDate"] = Convert.ToDateTime(model.CheckoutDate);
+            Session["NoOfGuest"] = model.NoOfGuest;
+            Session["TotalAmount"] = model.TotalAmount;
+            Session["BookingData"] = model;
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> VerifyPaymentST(Visitor model)
+        {
+
+            if (Session["BookingData"] == null)
+            {
+                return Json(new { success = false, message = "Session expired. Try again." });
+            }
+            Visitor booking = (Visitor)Session["BookingData"];
+            model.VisitorCode = Session["VisitorCode"]?.ToString();
+            model.FarmHouseCode = Session["FarmHouseCode"]?.ToString();
+            model.FarmHouseName = Session["FarmHouseName"]?.ToString();
+            model.CheckinDate = Convert.ToDateTime(Session["CheckinDate"]);
+            model.CheckoutDate = Convert.ToDateTime(Session["CheckoutDate"]);
+            model.NoOfGuest = Convert.ToInt32(Session["NoOfGuest"]);
+            model.TotalAmount = Convert.ToDecimal(Session["TotalAmount"]); ;
+            var client = new RazorpayClient(
+            ConfigurationManager.AppSettings["RazorpayKey"],
+            ConfigurationManager.AppSettings["RazorpaySecret"]
+                                            );
+
+            Payment payment = client.Payment.Fetch(model.RazorpayPaymentId);
+
+            string method = payment["method"].ToString();
+
+            string paymentTypeCode = "PT999";
+
+            if (method == "upi")
+                paymentTypeCode = "PT001";
+            else if (method == "card")
+                paymentTypeCode = "PT002";
+            else if (method == "netbanking")
+                paymentTypeCode = "PT003";
+
+            model.PaymentTypeCode = paymentTypeCode;
+
+            string invoiceNumber = "INV-" + DateTime.Now.ToString("yyyyMMdd") + "-" +
+                       new Random().Next(100, 999).ToString();
+            model.InvoiceNumber = invoiceNumber;
+
+            Session["FarmHouse"] = model.FarmHouseName;
+            Session["PaymentId"] = model.RazorpayPaymentId;
+            Session["TotalAmount"] = model.TotalAmount;
+            Session["FarmCode"] = model.FarmHouseCode;
+            Session["CheckinDate"] = model.CheckinDate.ToString("dd-MM-yyyy");
+            Session["CheckoutDate"] = model.CheckoutDate.ToString("dd-MM-yyyy");
+            Session["NoOfGuest"] = model.NoOfGuest;
+            Session["PaymentTypeCode"] = model.PaymentTypeCode;
+            Session["InvoiceNumber"] = invoiceNumber;
+
+            bool result = await objbalvisitor.VerifyandConfirmPaymentAsyncSt(model);
+
+            return Json(new
+            {
+                success = result,
+                message = result ? "Payment Successful" : "Paymnet verfication failed"
+            });
+
+        }
+        public ActionResult PaymentSuccessST()
+        {
+            ViewBag.PaymentId = Session["PaymentId"];
+            ViewBag.Amount = Session["TotalAmount"];
+            ViewBag.FarmHouse = Session["FarmHouse"];
+            ViewBag.CheckinDate = Session["CheckinDate"];
+            ViewBag.CheckoutDate = Session["CheckoutDate"];
+            ViewBag.NoOfGuest = Session["NoOfGuest"];
+            ViewBag.DateTime = DateTime.Now.ToString("dd-MMM-yyyy, hh:mm tt");
+
+            return View();
+        }
+
+        public async Task<ActionResult> DownloadInvoiceST()
+        {
+            ViewBag.PaymentId = Session["PaymentId"];
+            ViewBag.Amount = Session["TotalAmount"];
+            ViewBag.FarmHouse = Session["FarmHouse"];
+            ViewBag.CheckinDate = Session["CheckinDate"];
+            ViewBag.CheckoutDate = Session["CheckoutDate"];
+            ViewBag.NoOfGuest = Session["NoOfGuest"];
+            ViewBag.InvoiceNumber = Session["InvoiceNumber"]?.ToString() ?? "N/A";
+
+            string method = Session["PaymentTypeCode"]?.ToString();
+
+            if (method == "PT001") method = "UPI";
+            else if (method == "PT002") method = "Card";
+            else if (method == "PT003") method = "Net Banking";
+            else method = "Unknown";
+
+            ViewBag.PaymentMethod = method;
+
+            return new ViewAsPdf("InvoiceST")
+            {
+                FileName = "BookingInvoice.pdf"
+            };
+        }
+
+        public async Task<ActionResult> ViewInvoiceST()
+        {
+
+            ViewBag.PaymentId = Session["PaymentId"];
+            ViewBag.Amount = Session["TotalAmount"];
+            ViewBag.FarmHouse = Session["FarmHouse"];
+            ViewBag.CheckinDate = Session["CheckinDate"];
+            ViewBag.CheckoutDate = Session["CheckoutDate"];
+            ViewBag.NoOfGuest = Session["NoOfGuest"];
+            ViewBag.InvoiceNumber = Session["InvoiceNumber"]?.ToString() ?? "N/A";
+
+            string method = Session["PaymentTypeCode"]?.ToString();
+
+            if (method == "PT001") method = "UPI";
+            else if (method == "PT002") method = "Card";
+            else if (method == "PT003") method = "Net Banking";
+
+            ViewBag.PaymentMethod = method;
+
+
+            return View("InvoiceST");
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> RefundPaymentST(string razorpayPaymentId, decimal amount)
+        {
+            bool result = await objbalvisitor.RefundPaymentAsyncST(razorpayPaymentId, amount);
+
+            return Json(new { success = result });
+        }
+        //dummy booking remove if found....
+
+        public ActionResult TestBookingST()
+        {
+            Visitor V = new Visitor
+            {
+                VisitorCode = "VC001",
+                FarmHouseCode = "FH001",
+                CheckinDate = DateTime.Today.AddDays(4),
+                CheckoutDate = DateTime.Today.AddDays(6),
+                NoOfGuest = 4,
+                TotalAmount = 5000,
+                PaymentTypeCode = "PT001"
+            };
+
+            Session["BookingData"] = V;
+            Session["TotalAmount"] = V.TotalAmount;
+
+            return Content("Dummy Data stored in session");
+        }
+        #endregion shubham
     }
 }
 
