@@ -294,34 +294,7 @@ namespace GSTAgroTourism.Controllers
         }
 
         // ---------------------------------For Visitor Profile--------------------------------
-        //[HttpGet]
-        //public async Task<ActionResult> VisitorProfileAA(bool isEdit = false)
-        //{
-        //    string VisitorCode = Session["VisitorCode"]?.ToString();
-        //    if (VisitorCode == null)
-        //    {
-        //        return RedirectToAction("Login");
-        //    }
-        //    DataSet ds = await objbalvisitor.FetchVisitorProfileAA(VisitorCode);
-        //    RegistrationVH vs = new RegistrationVH();
 
-        //    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-        //    {
-        //        DataRow row = ds.Tables[0].Rows[0];
-        //        vs.VisitorCode = row["VisitorCode"].ToString();
-        //        vs.FullName = row["VFullName"].ToString();
-        //        vs.MobileNumber = row["VMobileNo"].ToString();
-        //        vs.EmailAddress = row["VEmail"].ToString();
-        //        vs.Address = row["VAddress"].ToString();
-        //        vs.AdharCardNo = row["VAdharCardNo"].ToString();
-        //        vs.Pincode = row["VPincode"].ToString();
-        //        vs.StateName = row["StateName"].ToString();
-        //        vs.CityName = row["CityName"].ToString();
-        //        vs.Gender = row["GenderName"].ToString();
-        //    }
-        //    ViewBag.IsEdit = isEdit;
-        //    return View(vs);
-        //}
         public async Task<ActionResult> VisitorProfileAA(bool isEdit = false)
         {
             string visitorCode = Session["VisitorCode"].ToString();
@@ -350,28 +323,6 @@ namespace GSTAgroTourism.Controllers
         }
 
         // ---------------------------------For Visitor Profile Post--------------------------------
-        /* [HttpPost]
-         public async Task<ActionResult> VisitorProfileAA(RegistrationVH vs)
-         {
-             if (!ModelState.IsValid)
-             {
-                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                 ViewBag.IsEdit = true;
-                 return View(vs);
-             }
-
-             try
-             {
-                 await objbalvisitor.EditVisitorProfileAA(vs.VisitorCode, vs.MobileNumber);
-                 TempData["SuccessMessage"] = "Profile updated successfully.";
-             }
-             catch (Exception ex)
-             {
-                 TempData["ErrorMessage"] = ex.Message;
-             }
-
-             return RedirectToAction("VisitorProfileAA");
-         }*/
 
         [HttpPost]
         public async Task<ActionResult> VisitorProfileAA(RegistrationVH vs)
