@@ -1308,40 +1308,6 @@ function toggleWishlist(btn) {
 
     });
 </script>
-<script>
-
-    document.querySelectorAll('.stat-num').forEach(counter => {
-
-        let target = parseFloat(counter.getAttribute('data-target'));
-
-        let count = 0;
-
-        let speed = target / 50;
-
-        let update = () => {
-
-            if (count < target) {
-
-                count += speed;
-
-                counter.innerText = Math.floor(count);
-
-                requestAnimationFrame(update);
-
-            }
-            else {
-
-                counter.innerText = target;
-
-            }
-
-        };
-
-        update();
-
-    });
-
-</script>
 @*sweetalerts&toasters*@
 <script>
     function showLoading(title, message) {
@@ -1463,4 +1429,34 @@ ${message}
         }, 1000);
 
     }
+    document.querySelectorAll('.stat-num').forEach(counter => {
+
+        let target = parseFloat(counter.getAttribute('data-target'));
+
+        let count = 0;
+
+        let speed = target / 50;
+
+        let update = () => {
+
+            if (count < target) {
+
+                count += speed;
+
+                counter.innerText = Math.floor(count);
+
+                requestAnimationFrame(update);
+
+            }
+            else {
+
+                counter.innerText = target;
+
+            }
+
+        };
+
+        update();
+
+    });
 </script>

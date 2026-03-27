@@ -16,6 +16,8 @@ namespace GSTAgroTourism.Controllers
     {
 
         BALFarmOwner objbalfarm = new BALFarmOwner();
+
+        #region Rutuja
         public ActionResult Index()
         {
             if (Session["VisitorCode"] != null)
@@ -25,45 +27,6 @@ namespace GSTAgroTourism.Controllers
 
             return View();
         }
-
-        //[HttpPost] //login 
-
-        //public async Task<ActionResult> Login(LoginRS model, string returnUrl)
-        //{
-
-        //    BALFarmOwner obj = new BALFarmOwner();
-        //    DataSet ds = await obj.Login(model);
-
-        //    if (ds.Tables[0].Rows.Count > 0)
-        //    {
-        //        // OWNER
-        //        Session["UserId"] = ds.Tables[0].Rows[0]["UserId"];
-        //        Session["Email"] = ds.Tables[0].Rows[0]["Email"];
-        //        Session["OwnerCode"] = ds.Tables[0].Rows[0]["FarmOwnerCode"];
-
-        //        return RedirectToAction("Dashboard", "FarmOwner");
-        //    }
-        //    else if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
-        //    {
-        //        // VISITOR
-        //        Session["UserId"] = ds.Tables[1].Rows[0]["UserId"];
-        //        Session["Email"] = ds.Tables[1].Rows[0]["Email"];
-        //        Session["VisitorCode"] = ds.Tables[1].Rows[0]["VisitorCode"];
-        //        Session["VisitorName"] = ds.Tables[1].Rows[0]["FullName"];
-        //        TempData["Login"] = "Success";
-
-        //        //        // 🔥 IMPORTANT PART
-        //        if (!string.IsNullOrEmpty(returnUrl))
-        //            return Redirect(returnUrl);
-
-        //        return RedirectToAction("Home", "Visitor");
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Message = "Invalid Email or Password";
-        //        return View("Index");
-        //    }
-        //}
 
         [HttpPost]
         public async Task<ActionResult> LoginRS(LoginRS model)
@@ -118,8 +81,6 @@ namespace GSTAgroTourism.Controllers
                 return View("Index", model);
             }
         }
-
-
         public ActionResult Logout()
         {
             TempData["Logout"] = true;
@@ -129,5 +90,6 @@ namespace GSTAgroTourism.Controllers
             return RedirectToAction("Home", "Visitor");
         }
 
+        #endregion Rutuja
     }
 }
