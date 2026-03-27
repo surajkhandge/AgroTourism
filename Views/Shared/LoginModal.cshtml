@@ -1,0 +1,185 @@
+﻿@model AgroClassLib.FarmOwner.LoginRS
+
+<!-- SweetAlert -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+<style>
+
+
+    .login-wrapper {
+        min-height: 90vh;
+    }
+
+    .login-card {
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        padding: 40px;
+        background: #ffffff;
+        /*        transition: 0.3s;*/
+    }
+    /*
+        .login-card:hover {
+            transform: translateY(-5px);
+        }*/
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+    .btn-login {
+        border-radius: 10px;
+        font-weight: 600;
+        background: linear-gradient(90deg,#11998e,#38ef7d);
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+
+    .link-style {
+        font-size: 14px;
+    }
+
+    .forgot-btn {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#ff416c,#ff4b2b);
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+        .forgot-btn:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+    .create-owner {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#2193b0,#6dd5ed);
+        color: white;
+        text-decoration: none;
+        margin-right: 10px;
+        transition: 0.3s;
+    }
+
+        .create-owner:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+    .create-visitor {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#f7971e,#ffd200);
+        color: black;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .create-visitor:hover {
+            transform: scale(1.05);
+        }
+</style>
+
+
+<h3 class="text-center mb-4 fw-bold">Welcome Back 👋</h3>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-danger text-center">
+        @ViewBag.Message
+    </div>
+}
+
+@using (Html.BeginForm("Login", "FarmOwner", FormMethod.Post))
+{
+    <div class="mb-3">
+        <label>Email</label>
+        @Html.TextBoxFor(m => m.UserEmail,
+            new
+            {
+                @class = "form-control",
+                placeholder = "Enter Email",
+                autocomplete = "off"
+            })
+        @Html.ValidationMessageFor(m => m.UserEmail, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        <label>Password</label>
+        @Html.PasswordFor(m => m.UserPassword,
+            new
+            {
+                @class = "form-control",
+                placeholder = "Enter Password",
+                autocomplete = "new-password"
+            })
+        @Html.ValidationMessageFor(m => m.UserPassword, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-login w-100 text-white" onclick="showAlert('login')">
+        Login
+    </button>
+
+    <div class="text-center mt-3">
+        <a href="@Url.Action("ForgotPassword","FarmOwner")"
+           class="forgot-btn">
+            🔒 Forgot Password?
+        </a>
+    </div>
+
+    <hr />
+
+    <div class="text-center mt-4">
+        <p class="fw-bold mb-3">Create Account As</p>
+
+        <a href="@Url.Action("Register","FarmOwner")"
+           class="create-owner">
+            Farm Owner
+        </a>
+
+        <a href="@Url.Action("Home","Visitor")"
+           class="create-visitor">
+            Visitor
+        </a>
+    </div>
+}
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function showAlert(type) {
+
+        if (type === "login") {
+
+            Swal.fire({
+                title: "Login Successful",
+                text: "Welcome back!",
+                icon: "success",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+        }
+
+        if (type === "logout") {
+
+            Swal.fire({
+                title: "Logout Successful",
+                text: "You have been logged out",
+                icon: "success",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+        }
+
+    }
+</script>

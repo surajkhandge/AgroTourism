@@ -1,0 +1,377 @@
+﻿@model AgroClassLib.Visitor.BookingTP
+
+<style>
+
+    /* MODAL HEADER */
+
+    .modal-header {
+        background: #2f5d9a;
+        color: white;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+    /* MAIN MODAL CARD */
+
+    .modal-content {
+        border-radius: 14px;
+        border: none;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+    }
+
+    .modal-body {
+        background: #f8fafc;
+    }
+
+    /* BOOKING INFO CARD */
+
+    .col-md-8 .card {
+        border-radius: 12px;
+        border: 1px solid #e6e6e6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .col-md-8 .card-body {
+        padding: 22px;
+    }
+
+    /* FARM IMAGE */
+
+    .col-md-8 img {
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid #e5e5e5;
+    }
+
+    /* TITLES */
+
+    h6 {
+        font-weight: 600;
+        color: #2f5d9a;
+    }
+
+    strong {
+        color: #444;
+        font-size: 14px;
+    }
+
+    /* TEXT */
+
+    small {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .col-md-8 {
+        font-size: 14px;
+        color: #444;
+    }
+
+    /* ROOMS + ACTIVITIES */
+
+    ul {
+        padding-left: 0;
+    }
+
+        ul li {
+            font-size: 14px;
+            padding: 3px 0;
+        }
+
+            ul li i {
+                color: #2f5d9a;
+            }
+
+    /* SECTION DIVIDER */
+
+    hr {
+        margin: 18px 0;
+        border-top: 1px solid #e6e6e6;
+    }
+
+    /* BILLING SUMMARY SIMPLE */
+
+    .col-md-4 .card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e6e6e6;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+
+    .col-md-4 .card-body {
+        padding: 20px;
+    }
+
+    .col-md-4 span {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    /* VIEW INVOICE BUTTON */
+
+    .viewInvoiceBtn {
+        background: #28a745;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+        .viewInvoiceBtn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+    /* HOVER EFFECT */
+
+    .card {
+        transition: all .2s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+</style>
+<div class="container-fluid p-3">
+
+    <div class="row">
+
+        <!-- LEFT SECTION -->
+        <div class="col-md-8">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+
+                    <h6 class="fw-bold mb-3">Booking Information</h6>
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <img src="https://picsum.photos/95/65"
+                             style="width:95px;height:65px;border-radius:8px;margin-right:15px;" />
+
+                        <div>
+                            <h6 class="fw-bold mb-0">@Model.FarmHouseName</h6>
+                            <small class="text-muted">@Model.FarmAddress</small>
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- VISIT DATES -->
+                    <div class="mb-3">
+
+                        <strong>Visit Dates</strong>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <small class="text-muted">Check-in</small><br />
+                                @(Model.CheckinDate == DateTime.MinValue ? "" : Model.CheckinDate.ToString("yyyy-MM-dd"))
+                            </div>
+
+                            <div class="col-md-6">
+                                <small class="text-muted">Check-out</small><br />
+                                @(Model.CheckoutDate == DateTime.MinValue ? "" : Model.CheckoutDate.ToString("yyyy-MM-dd"))
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- ROOMS -->
+                    <div class="mb-3">
+
+                        <strong>Rooms & Activities</strong>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+
+                                <small class="text-muted">Rooms</small>
+
+                                <ul class="mt-2 list-unstyled">
+
+                                    @if (Model.Rooms != null)
+                                    {
+                                        foreach (var room in Model.Rooms)
+                                        {
+                                            <li class="mb-1">
+                                                <i class="bi bi-door-open me-2"></i>@room
+                                            </li>
+                                        }
+                                    }
+
+                                </ul>
+
+                            </div>
+
+                            <!-- ACTIVITIES -->
+                            <div class="col-md-6">
+
+                                <small class="text-muted">Activities</small>
+
+                                <ul class="mt-2 list-unstyled">
+
+                                    @if (Model.Activities != null)
+                                    {
+                                        foreach (var act in Model.Activities)
+                                        {
+                                            <li class="mb-1">
+                                                <i class="bi bi-check2 me-2 text-success"></i>@act
+                                            </li>
+                                        }
+                                    }
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- GUEST DETAILS -->
+                    <div>
+
+                        <strong>Guest Details</strong>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-4">
+                                <small class="text-muted">Name</small><br />
+                                @Model.VisitorName
+                            </div>
+
+                            <div class="col-md-4">
+                                <small class="text-muted">Email</small><br />
+                                @Model.Email
+                            </div>
+
+                            <div class="col-md-4">
+                                <small class="text-muted">Phone</small><br />
+                                @Model.MobileNo
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SECTION -->
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+
+                    <h6 class="fw-bold mb-3">Billing Summary</h6>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total Paid</span>
+                        <span>₹ @Model.TotalAmount</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- VIEW INVOICE BUTTON -->
+    <div class="mt-4">
+
+        <button class="btn btn-success viewInvoiceBtn"
+                data-booking="@Model.BookingCode"
+                data-visitor="@Session["VisitorCode"]">
+            View Invoice
+        </button>
+        <!-- ADD REVIEW BUTTON -->
+        <a class="btn btn-primary addReviewBtn"
+           href="@Url.Action("AddReviewSKK","Visitor",
+   new { bookingCode = Model.BookingCode })">
+            <i class="fa-solid fa-star me-1"></i> Add Review
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- INVOICE MODAL -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Invoice Details</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="invoiceBody">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!--  INVOICE  -->
+<script>
+
+    $(document).on("click", ".viewInvoiceBtn", function () {
+
+        var bookingCode = $(this).data("booking");
+
+        $.ajax({
+          url: '@Url.Action("GetInvoiceDetailsTP","Visitor")',
+            type: "GET",
+            data: { bookingCode: bookingCode },
+
+            success: function (result) {
+
+                $("#invoiceBody").html(result);
+
+                var invoiceModal =
+                    new bootstrap.Modal(document.getElementById("invoiceModal"));
+
+                invoiceModal.show();
+            },
+
+            error: function (xhr) {
+
+                console.log(xhr.responseText);
+                alert("Invoice load failed");
+
+            }
+
+        });
+
+    });
+
+</script>

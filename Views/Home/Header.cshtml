@@ -1,0 +1,265 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - AgroTrip India</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    @*<link rel="stylesheet" href="~/style.css" />*@
+    @*<link href="~/Content/CSS/style.css" rel="stylesheet" />*@
+    <link href="~/Content/CSS/style1.css" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- ========== LOADING SKELETON ========== -->
+    @*<div id="pageLoader">
+            <div class="loader-logo">
+                <i class="fa-solid fa-seedling"></i>
+                <span>AgroTrip India</span>
+            </div>
+            <div class="loader-bar"><div class="loader-fill"></div></div>
+        </div>*@
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="@Url.Action("Index", "Home")">
+                <span class="brand-icon"><i class="fa-solid fa-seedling"></i></span>
+                <span class="brand-text">AgroTrip <span class="brand-accent">India</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                    <li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#farmhouses">Farmhouses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#experiences">Experiences</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#activities">Activities</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-nav-outline" href="#feedback">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-nav-primary" href="#cta">List Farm</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero-section" id="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-particles" id="heroParticles"></div>
+        <div class="container hero-content">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-9">
+                    <div class="hero-badge reveal-up">
+                        <i class="fa-solid fa-leaf"></i> #1 Agro Tourism Platform in India
+                    </div>
+                    <h1 class="hero-heading reveal-up">Explore <span class="text-accent">Rural</span> India</h1>
+                    <a class="hero-sub reveal-up">Experience authentic agro tourism stays – breathe fresh air, taste village food &amp; reconnect with nature</a>
+
+                    <!-- Search Bar -->
+                    <div class="hero-search reveal-up">
+                        <div class="search-glass">
+                            @using (Ajax.BeginForm("SearchFarmhouses", "Home", new AjaxOptions
+                            {
+                                HttpMethod = "POST",
+                                UpdateTargetId = "farmListWrapper",
+                                InsertionMode = InsertionMode.Replace,
+                                OnBegin = "onSearchBegin",
+                                OnSuccess = "onSearchSuccess"
+                            }))
+                            {
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-lg-4 col-md-4 search-field border-end-lg">
+                                        <label><i class="fa-solid fa-map-marker-alt text-accent"></i> Destination</label>
+                                        @Html.TextBox("destination", "", new { @class = "form-control", placeholder = "Where do you want to go?", id = "searchDestination" })
+                                    </div>
+                                    <div class="col-lg-3 col-md-4 search-field border-end-lg">
+                                        <label><i class="fa-solid fa-calendar-check text-accent"></i> Check-in</label>
+                                        <input type="date" name="checkin" id="searchCheckin" class="form-control" required />
+                                    </div>
+                                    <div class="col-lg-3 col-md-4 search-field">
+                                        <label><i class="fa-solid fa-calendar-xmark text-accent"></i> Check-out</label>
+                                        <input type="date" name="checkout" id="searchCheckout" class="form-control" required />
+                                    </div>
+                                    <div class="col-lg-2 col-md-12 search-btn-wrap mt-md-2 mt-lg-0">
+                                        <button type="submit" class="btn btn-search w-100" id="heroSearchBtn">
+                                            <i class="fa-solid fa-magnifying-glass"></i> Search
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="hero-stats reveal-up">
+                        <div class="hstat"><strong>@ViewBag.TotalFarmhouses+</strong><span>Farmhouses</span></div>
+                        <div class="hstat-divider"></div>
+                        <div class="hstat"><strong>@ViewBag.TotalGuests+</strong><span>Happy Guests</span></div>
+                        <div class="hstat-divider"></div>
+                        <div class="hstat"><strong>@ViewBag.Destinations</strong><span>Destinations</span></div>
+                        <div class="hstat-divider"></div>
+                        <div class="hstat"><strong>@ViewBag.AverageRating <i class="fa-solid fa-star text-warning"></i></strong><span>Rating</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-cue">
+            <a href="#destinations"><i class="fa-solid fa-chevron-down"></i></a>
+        </div>
+    </section>
+
+
+
+    @section Scripts {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+
+        <script>
+    function onSearchBegin() {
+        showToast('🔍 Searching farmhouses...', 'info');
+    }
+
+    function onSearchSuccess() {
+        showToast('✅ Search completed!', 'success');
+        document.getElementById('farmhouses').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        initTilt(); // Re-initialize hover effects on new loaded items
+    }
+
+    function feedbackSuccess(res) {
+        if(res.success) {
+            showToast(res.tempMessage || 'Thank you for your feedback!', 'success');
+            document.getElementById("feedbackForm").reset();
+        } else {
+            showToast(res.message || 'Validation failed. Please check form.', 'error');
+        }
+
+        const btnText = document.getElementById('fbBtnText');
+        const btnSpinner = document.getElementById('fbBtnSpinner');
+        btnText.classList.remove('d-none');
+        btnSpinner.classList.add('d-none');
+    }
+
+    function feedbackFailure() {
+        showToast('Failed to connect to server.', 'error');
+        const btnText = document.getElementById('fbBtnText');
+        const btnSpinner = document.getElementById('fbBtnSpinner');
+        btnText.classList.remove('d-none');
+        btnSpinner.classList.add('d-none');
+    }
+
+    // Attach spinner to form submit
+    $('#feedbackForm').on('submit', function() {
+        if($(this).valid()) {
+            $('#fbBtnText').addClass('d-none');
+            $('#fbBtnSpinner').removeClass('d-none');
+        }
+    });
+
+    function addToWishlist(farmId, element) {
+        $.post('@Url.Action("AddWishlist", "Home")', { id: farmId }, function(res) {
+            if(res.success) {
+                toggleWishlist(element);
+            }
+        });
+    }
+
+    @if(TempData["Success"] != null)
+    {
+        <text>
+        $(document).ready(function() {
+            showToast('@TempData["Success"]', 'success');
+        });
+        </text>
+    }
+        </script>
+    }
+
+    @*@RenderBody()*@
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <span class="brand-icon"><i class="fa-solid fa-seedling"></i></span>
+                        <span class="brand-text ms-2">AgroTrip <span class="brand-accent">India</span></span>
+                    </div>
+                    <p class="footer-desc mt-3">India's most trusted agro tourism platform connecting travellers with authentic rural farmhouse experiences across the country.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="social-link" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-link" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="social-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="footer-heading">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#destinations">Destinations</a></li>
+                        <li><a href="#farmhouses">Farmhouses</a></li>
+                        <li><a href="#experiences">Experiences</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">About AgroTrip</a></li>
+                        <li><a href="#">Help & FAQs</a></li>
+                        <li><a href="#">Cancellation Policy</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">Get In Touch</h6>
+                    <ul class="footer-contact">
+                        <li><i class="fa-solid fa-phone text-accent"></i> +91 98765 43210</li>
+                        <li><i class="fa-solid fa-envelope text-accent"></i> hello@agrotripindia.com</li>
+                        <li><i class="fa-solid fa-location-dot text-accent"></i> Pune, India</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr" />
+            <div class="footer-bottom text-center">
+                <p>© 2026 AgroTrip India. All rights reserved. Made with <i class="fa-solid fa-heart text-accent"></i> for Rural India.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+        <div id="mainToast" class="toast toast-custom align-items-center" role="alert">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-accent fs-5" id="toastIcon"></i>
+                    <span id="toastMsg">Thank you!</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/script.js"></script>
+
+    @*@RenderSection("Scripts", required: false)*@
+
+</body>
+</html>

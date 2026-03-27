@@ -1,0 +1,1466 @@
+﻿@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+
+    var Popular = ViewBag.PopularDestination as List<AgroClassLib.Visitor.VisitorSK>;
+    var TopFarm = ViewBag.TopRatedFarms as List<AgroClassLib.Visitor.VisitorSK>;
+    var Activities = ViewBag.TopActivities as List<AgroClassLib.Visitor.VisitorSK>;
+    var Reviews = ViewBag.TopReviews as List<AgroClassLib.Visitor.VisitorSK>;
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+
+@Styles.Render("~/Content/CSS/Visitor.css")
+
+
+<style>
+
+    /* SEARCH BAR */
+    .search-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px 25px;
+        width: 100%;
+        max-width: 1100px;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .search-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        color: white;
+        position: relative;
+    }
+
+        .search-item input {
+            background: transparent !important;
+            border: none;
+            color: white;
+            font-size: 16px;
+            margin-top: 5px;
+            box-shadow: none;
+        }
+
+            .search-item input:focus {
+                background: transparent !important;
+                outline: none;
+                box-shadow: none;
+            }
+
+            .search-item input:-webkit-autofill {
+                -webkit-box-shadow: 0 0 0 1000px transparent inset;
+                -webkit-text-fill-color: white;
+                transition: background-color 5000s ease-in-out 0s;
+            }
+
+    #checkinDate,
+    #checkoutDate {
+        background: transparent !important;
+        color: white;
+    }
+
+    .search-item label {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+
+    .search-item input {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 16px;
+        margin-top: 5px;
+    }
+
+        .search-item input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-item input:focus {
+            outline: none;
+        }
+
+    .suggestion-box {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-top: 2px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        z-index: 999;
+    }
+
+    /* items */
+
+    .suggestion-item {
+        padding: 10px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+        /* last border remove */
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        /* hover */
+
+        .suggestion-item:hover {
+            background: #f5f5f5;
+        }
+
+        /* selected */
+
+        .suggestion-item.active {
+            background: #e9f5ee;
+            color: #1F4D3A;
+            font-weight: 500;
+        }
+
+
+    .divider {
+        width: 1px;
+        height: 45px;
+        background: rgba(255,255,255,0.3);
+    }
+
+    .search-button {
+        background: linear-gradient(90deg,#f4a261,#e76f51);
+        border: none;
+        padding: 18px 30px;
+        border-radius: 15px;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: .3s;
+    }
+
+        .search-button:hover {
+            transform: scale(1.05);
+        }
+
+    /* MODAL */
+    .city-modal {
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    .city-input {
+        padding: 12px 15px;
+        border-radius: 30px;
+    }
+
+    .farm-card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .image-wrapper {
+        position: relative;
+    }
+
+    .wishlist-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #fff;
+        border: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .wishlist-btn i {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .wishlist-btn.active i {
+            color: red;
+        }
+
+    .rating-badge {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: #f4a300;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .view-btn {
+        border: 2px solid #1F4D3A;
+        border-radius: 25px;
+        padding: 6px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        background: transparent;
+        color: #1F4D3A !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+    }
+
+        .view-btn:hover {
+            background: #1F4D3A;
+            color: #fff !important;
+        }
+
+    .view-all-link {
+        color: #1F4D3A;
+        font-weight: 500;
+        font-size: 16px;
+        text-decoration: none;
+        transition: 0.3s ease;
+        display: flex;
+        align-items: center;
+        font-family: sans-serif;
+    }
+
+        .view-all-link i {
+            transition: 0.3s ease;
+        }
+
+        .view-all-link:hover {
+            color: #F4A300;
+        }
+
+            .view-all-link:hover i {
+                transform: translateX(4px);
+            }
+
+    #destinations {
+        padding-top: 40px;
+    }
+
+    .destination-card {
+        text-decoration: none;
+        color: #333;
+        display: block;
+        border-radius: 15px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        transition: 0.3s ease;
+    }
+
+        .destination-card:hover {
+            transform: translateY(-8px);
+        }
+
+    .destination-img-wrap {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .destination-img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: .5s;
+    }
+
+    .destination-card:hover .destination-img {
+        transform: scale(1.08);
+    }
+
+    .destination-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient( to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1) );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: .4s;
+    }
+
+    .destination-card:hover .destination-overlay {
+        opacity: 1;
+    }
+
+    .explore-btn {
+        background: #f4a261;
+        border: none;
+        color: white;
+        padding: 10px 22px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: .3s;
+    }
+
+        .explore-btn:hover {
+            background: #e76f51;
+        }
+
+    .destination-body {
+        padding: 18px;
+    }
+
+        .destination-body h5 {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #1b4332;
+        }
+
+        .destination-body p {
+            color: #777;
+            font-size: 14px;
+            margin: 0;
+        }
+</style>
+
+@*Search Section Start*@
+<section class="hero-section" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="container hero-content">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-9">
+                <div class="hero-badge reveal-up">
+                    <i class="fa-solid fa-leaf"></i> #1 Agro Tourism Platform in India
+                </div>
+                <h1 class="hero-heading reveal-up">Explore <span class="text-accent">Rural</span> India</h1>
+                <p class="hero-sub reveal-up">Experience authentic agro tourism stays – breathe fresh air, taste village food &amp; reconnect with nature</p>
+
+                <!-- SEARCH BAR -->
+                <div class="search-wrapper">
+
+                    <div class="search-bar">
+
+                        <!-- DESTINATION -->
+                        <div class="search-item">
+
+                            <label>
+                                <i class="fa-solid fa-location-dot text-warning"></i>
+                                DESTINATION
+                            </label>
+
+                            <input type="text"
+                                   id="citySearchBox"
+                                   placeholder="Where do you want to go?"
+                                   autocomplete="off">
+
+                            <div id="citySuggestions" class="suggestion-box"></div>
+
+                        </div>
+
+
+                        <div class="divider"></div>
+
+
+                        <!-- CHECKIN -->
+                        <div class="search-item">
+
+                            <label>
+                                <i class="fa-solid fa-calendar-check text-warning"></i>
+                                CHECK-IN
+                            </label>
+
+                            <input type="text"
+                                   id="checkinDate"
+                                   placeholder="Add date"
+                                   readonly>
+
+                        </div>
+
+
+                        <div class="divider"></div>
+
+
+                        <!-- CHECKOUT -->
+                        <div class="search-item">
+
+                            <label>
+                                <i class="fa-solid fa-calendar-xmark text-warning"></i>
+                                CHECK-OUT
+                            </label>
+
+                            <input type="text"
+                                   id="checkoutDate"
+                                   placeholder="Add date"
+                                   readonly>
+
+                        </div>
+
+
+                        <!-- SEARCH BUTTON -->
+                        <button class="search-button" id="mainSearchBtn">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+            @*<div class="hero-stats reveal-up">
+                    <div class="hstat"><strong>@ViewBag.TotalFarmhouses+</strong><span>Farmhouses</span></div>
+                    <div class="hstat-divider"></div>
+                    <div class="hstat"><strong>@ViewBag.TotalGuests+</strong><span>Happy Guests</span></div>
+                    <div class="hstat-divider"></div>
+                    <div class="hstat"><strong>@ViewBag.Destinations</strong><span>Destinations</span></div>
+                    <div class="hstat-divider"></div>
+                    <div class="hstat"><strong>@ViewBag.AverageRating <i class="fa-solid fa-star text-warning"></i></strong><span>Rating</span></div>
+                </div>*@
+        </div>
+    </div>
+    </div>
+    @*<div class="hero-scroll-cue">
+            <a href="#destinations"><i class="fa-solid fa-chevron-down"></i></a>
+        </div>*@
+</section>
+<div id="searchResultContainer"></div>
+<div id="toastContainer" class="toast-container"></div>
+@*Seacrh Section End*@
+
+@*Popular Destinations Section Start*@
+<section class="section-pad mb-5" id="destinations">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h2 class="h2 fw-bold mb-0">Popular Destinations</h2>
+            <a href="@Url.Action("FarmHousesListSK","Visitor")"
+               onclick="goToCity()"
+               class="view-all-link">
+                View All Farmhouses
+                <i class="bi bi-arrow-right ms-1 "></i>
+            </a>
+        </div>
+
+        <div class="row">
+
+            @{
+                int index = 0;
+                string[] images = new string[]
+                {
+        Url.Content("~/uploads/Pune.jpeg"),
+        Url.Content("~/uploads/Nagpur.png"),
+        Url.Content("~/uploads/Ratanagiri.jpg"),
+        Url.Content("~/uploads/Satara.jpg")
+};
+            }
+
+            @foreach (var item in Popular)
+            {
+                string imgPath = images[index % images.Length];
+
+                <div class="col-sm-6 col-lg-3 mb-4">
+
+                    <a class="destination-card"
+                       onclick="goToCity('@Url.Action("SearchResultSK","Visitor", new { cityId = item.CityId })')">
+
+                        <div class="destination-img-wrap">
+
+                            <img src="@imgPath"
+                                 class="destination-img" />
+
+                            <div class="destination-overlay">
+
+                                <button class="explore-btn">
+
+                                    Explore<i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="destination-body">
+
+                            <h5>
+                                @item.CityName
+                            </h5>
+
+                            <p>
+
+                                <i class="fa-solid fa-house text-warning"></i>
+
+                                @item.FarmHouseCount Farmhouses
+
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                index++;
+            }
+
+        </div>
+
+    </div>
+</section>
+@*Popular Destinations Section End*@
+
+@*Top Rated Farms Section Start*@
+<section class="section-pad mb-5" id="farmhouses">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h2 class="h2 fw-bold mb-0">Top Rated Stays</h2>
+        </div>
+        <div class="row">
+
+            @foreach (var item in TopFarm)
+            {
+                <div class="col-sm-6 col-lg-3 mb-4 d-flex">
+
+                    <div class="card shadow-sm w-100 border-0 farm-card">
+
+                        <!-- IMAGE WRAPPER -->
+                        <div class="image-wrapper">
+
+                            <img class="card-img-top img-fluid"
+                                 src="https://images.unsplash.com/photo-1567688040542-d9a5d079b7c0"
+                                 style="height:220px; object-fit:cover;" />
+                            <!-- Wishlist -->
+                            <button class="wishlist-btn"
+                                    data-farm="@item.FarmHouseCode"
+                                    onclick="toggleWishlist(this)">
+                                <i class="bi bi-heart"></i>
+                            </button>
+
+                            <!-- Rating Badge -->
+                            <div class="rating-badge">
+                                <i class="bi bi-star-fill"></i>
+                                @item.AvgRating
+                            </div>
+
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="card-body d-flex flex-column">
+
+                            <h5 class="card-title fw-bold mb-1">
+                                @item.FarmHouseName
+                            </h5>
+
+                            <p class="text-muted small mb-3">
+                                @item.CityName
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+
+                                <div>
+                                    <span class="fw-bold text-warning">
+                                        ₹@item.LowestPrice
+                                    </span>
+                                    <small class="text-muted"> / night</small>
+                                </div>
+
+                                <a class="btn btn-outline-success btn-rounded" onclick="openFarm('@Url.Action("FarmDetailsSK","Visitor", new { id = item.FarmHouseCode })') ">
+                                    View Details
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</section>
+@*Top Rated Farms Section End*@
+
+<!-- ========== EXPERIENCE RURAL LIFE SECTION START========== -->
+<section class="section-pad" id="experiences">
+    <div class="container">
+        <div class="section-header text-center reveal-up">
+            <span class="section-tag">Immersive</span>
+            <h2 class="section-title">Experience <span class="text-primary-brand">Rural Life</span></h2>
+            <p class="section-sub">Reconnect with nature through hands-on village experiences</p>
+        </div>
+        <div class="row g-4 mt-2">
+            <div class="col-lg-3 col-md-6 reveal-up"><div class="exp-card"><div class="exp-icon-wrap"><i class="fa-solid fa-tractor"></i></div><h5>Farming Experience</h5><p>Get your hands dirty in the fields. Plough, sow seeds, and harvest fresh produce with local farmers.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal-up" style="--delay:.1s"><div class="exp-card"><div class="exp-icon-wrap"><i class="fa-solid fa-bowl-food"></i></div><h5>Village Food</h5><p>Savour authentic home-cooked meals made from fresh organic produce straight from the farm.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal-up" style="--delay:.2s"><div class="exp-card"><div class="exp-icon-wrap"><i class="fa-solid fa-fire"></i></div><h5>Campfire Nights</h5><p>Gather around a warm campfire under the stars – enjoy folk music, local stories, and the night sky.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal-up" style="--delay:.3s"><div class="exp-card"><div class="exp-icon-wrap"><i class="fa-solid fa-cow"></i></div><h5>Dairy Experience</h5><p>Learn the art of milking cows, making butter &amp; paneer, and understand dairy operations first-hand.</p></div></div>
+        </div>
+    </div>
+</section>
+<!-- ========== EXPERIENCE RURAL LIFE SECTION END========== -->
+<!-- ========== WHY CHOOSE AGRO TOURISM SECTION START ========== -->
+<section class="section-pad why-section">
+    <div class="container">
+        <div class="section-header text-center reveal-up">
+            <span class="section-tag why-tag">Our Promise</span>
+            <h2 class="section-title text-white">Why Choose <span class="text-accent">Agro Tourism?</span></h2>
+            <p class="section-sub text-white-50">More than just a stay – it's an experience that changes lives</p>
+        </div>
+        <div class="row g-4 mt-2">
+            <div class="col-lg-4 col-md-6 reveal-up"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-leaf"></i></div><h5>Eco Friendly Tourism</h5><p>Sustainable travel that respects nature and reduces your carbon footprint.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal-up" style="--delay:.1s"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-hand-holding-heart"></i></div><h5>Support Farmers</h5><p>Your stay directly benefits local farmers and their families.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal-up" style="--delay:.2s"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-apple-whole"></i></div><h5>Organic Food</h5><p>Enjoy fresh, chemical-free produce grown right on the farm.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal-up" style="--delay:.1s"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-mountain-sun"></i></div><h5>Peaceful Environment</h5><p>Escape the city buzz and enjoy serene rural surroundings.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal-up" style="--delay:.2s"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-compass"></i></div><h5>Authentic Experience</h5><p>Genuine rural culture, traditions and warm village hospitality.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal-up" style="--delay:.3s"><div class="why-card"><div class="why-icon"><i class="fa-solid fa-tag"></i></div><h5>Affordable Stay</h5><p>Premium farm experiences at pocket-friendly prices. No hidden charges.</p></div></div>
+        </div>
+    </div>
+</section>
+<!-- ========== WHY CHOOSE AGRO TOURISM SECTION END ========== -->
+<!-- ========== ACTIVITIES CAROUSEL SECTION START ========== -->
+<section class="section-pad" id="activities">
+
+    <div class="container">
+
+        <div class="section-header text-center reveal-up">
+
+            <span class="section-tag">Fun & Adventure</span>
+
+            <h2 class="section-title">
+                Farm <span class="text-primary-brand">Activities</span>
+            </h2>
+
+            <p class="section-sub">
+                Packed activities for every age group
+            </p>
+
+        </div>
+
+
+        <div id="activitiesCarousel"
+             class="carousel slide mt-4"
+             data-bs-ride="carousel">
+
+            <div class="carousel-inner">
+
+                @{
+                    int count = 0;
+                }
+
+                @if (Activities != null && Activities.Count > 0)
+                {
+
+                    for (int i = 0; i < Activities.Count; i += 3)
+                    {
+
+                        <div class="carousel-item @(count==0 ? "active" : "")">
+
+                            <div class="row g-4">
+
+                                @for (int j = i; j < i + 3 && j < Activities.Count; j++)
+                                {
+
+                                    <div class="col-lg-4 col-md-6">
+
+                                        <div class="act-card">
+
+                                            <div class="act-img-wrap">
+
+                                                <img src="@Url.Content("~/uploads/Common/Activities/"+Activities[j].ImagePath)"
+                                                     class="act-img"
+                                                     onerror="this.src='/Images/noimage.png'" />
+
+                                            </div>
+
+                                            <div class="act-body">
+
+                                                <h6>@Activities[j].Name</h6>
+
+                                                <p>@Activities[j].Description</p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                }
+
+                            </div>
+
+                        </div>
+
+                        count++;
+
+                    }
+
+                }
+
+            </div>
+
+
+            <div class="carousel-controls-row">
+
+                <button class="carousel-control-prev carousel-ctrl"
+                        type="button"
+                        data-bs-target="#activitiesCarousel"
+                        data-bs-slide="prev">
+
+                    <i class="fa-solid fa-chevron-left"></i>
+
+                </button>
+
+
+                <button class="carousel-control-next carousel-ctrl"
+                        type="button"
+                        data-bs-target="#activitiesCarousel"
+                        data-bs-slide="next">
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========== ACTIVITIES CAROUSEL SECTION END ========== -->
+<!-- ========== SUPPORT FARMERS SECTION START ========== -->
+<section class="section-pad support-section" id="support">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 reveal-left">
+                <div class="support-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800&q=80" alt="Support farmers" class="support-img" />
+                    <div class="support-badge-float">
+                        <i class="fa-solid fa-award"></i>
+                        <div><strong>Trusted by</strong><span>@ViewBag.TotalGuests Guests</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 reveal-right">
+                <span class="section-tag">Community First</span>
+                <h2 class="section-title">Support Farmers <span class="text-primary-brand">Grow Income</span></h2>
+                <p class="support-text">AgroTrip helps farmers earn additional income through tourism and supports rural development across India.</p>
+                <ul class="support-list">
+                    <li><i class="fa-solid fa-circle-check text-accent"></i> Extra income for farming families</li>
+                    <li><i class="fa-solid fa-circle-check text-accent"></i> Promotes rural employment opportunities</li>
+                    <li><i class="fa-solid fa-circle-check text-accent"></i> Supports village economy &amp; local business</li>
+                    <li><i class="fa-solid fa-circle-check text-accent"></i> Eco tourism &amp; sustainable development</li>
+                </ul>
+                <a href="#cta" class="btn btn-primary-brand mt-3">Register As FarmOwner <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ========== SUPPORT FARMERS SECTION END ========== -->
+<!-- ========== Reviews CAROUSEL SECTION START ========== -->
+<section class="section-pad mb-5" id="reviews">
+
+    <div class="container">
+
+        <div class="section-header text-center">
+
+            <span class="section-tag">
+                Testimonials
+            </span>
+
+            <h2 class="section-title">
+                What Our Guests Say
+            </h2>
+
+            <p class="section-sub">
+                Real experiences from travellers
+            </p>
+
+        </div>
+
+
+        <div id="reviewCarousel"
+             class="carousel slide mt-4"
+             data-bs-ride="carousel">
+
+            <div class="carousel-inner">
+
+                @{
+                    int reviewcount = 0;
+                }
+
+                @if (Reviews != null && Reviews.Count > 0)
+                {
+
+                    for (int i = 0; i < Reviews.Count; i += 3)
+                    {
+
+                        <div class="carousel-item @(reviewcount==0?"active":"")">
+
+                            <div class="row g-4">
+
+                                @for (int j = i; j < i + 3 && j < Reviews.Count; j++)
+                                {
+
+                                    <div class="col-lg-4 col-md-6">
+
+                                        <div class="review-card">
+
+                                            <div class="stars">
+
+                                                @for (int s = 1; s <= 5; s++)
+                                                {
+
+                                                    if (s <= Reviews[j].RatingCount)
+                                                    {
+
+                                                        <i class="fa fa-star text-warning"></i>
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <i class="fa fa-star text-muted"></i>
+
+                                                    }
+
+                                                }
+
+                                            </div>
+
+
+                                            <p class="review-text">
+
+                                                "@Reviews[j].ReviewComment"
+
+                                            </p>
+
+
+                                            <div class="review-user">
+
+                                                @*<img src="~/VisitorImages/@Reviews[j].VisitorImage"
+                                                    class="review-img"
+                                                    onerror="this.src='/Images/user.png'" />*@
+                                                <div class="review-avatar">
+
+                                                    <i class="fa-solid fa-user"></i>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <h6 class="mb-0">
+
+                                                        @Reviews[j].VisitorName
+
+                                                    </h6>
+
+                                                    <small class="text-muted">
+
+                                                        <i class="fa-solid fa-location-dot"></i>
+
+                                                        @Reviews[j].CityName
+
+                                                    </small>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                }
+
+                            </div>
+
+                        </div>
+
+                        reviewcount++;
+
+                    }
+
+                }
+
+            </div>
+
+
+
+            <div class="carousel-controls-row">
+
+                <button class="carousel-control-prev carousel-ctrl"
+                        type="button"
+                        data-bs-target="#reviewCarousel"
+                        data-bs-slide="prev">
+
+                    <i class="fa-solid fa-chevron-left"></i>
+
+                </button>
+
+
+                <button class="carousel-control-next carousel-ctrl"
+                        type="button"
+                        data-bs-target="#reviewCarousel"
+                        data-bs-slide="next">
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========== Reviews CAROUSEL SECTION END ========== -->
+<!-- ========== STATISTICS SECTION START ========== -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row g-4 text-center">
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-house-chimney"></i>
+                    </div>
+
+                    <div class="stat-num" data-target="@ViewBag.TotalFarmhouses">
+                        0
+                    </div>
+
+                    <div class="stat-plus">+</div>
+                    <div class="stat-label">Farmhouses</div>
+                </div>
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-item">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <div class="stat-num" data-target="@ViewBag.TotalVisitors">
+                        0
+                    </div>
+
+                    <div class="stat-plus">+</div>
+                    <div class="stat-label">Visitors</div>
+
+                </div>
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-item">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
+
+                    <div class="stat-num" data-target="@ViewBag.Destinations">
+                        0
+                    </div>
+
+                    <div class="stat-label">Destinations</div>
+
+                </div>
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-item">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div class="stat-num" data-target="@ViewBag.AverageRating">
+                        0
+                    </div>
+
+                    <div class="stat-label">Average Rating</div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- ========== STATISTICS SECTION END ========== -->
+<!-- ========== CTA SECTION START ========== -->
+<section class="cta-section" id="cta">
+    <div class="cta-overlay"></div>
+    <div class="container cta-content text-center">
+        <div class="reveal-up">
+            <span class="cta-tag"><i class="fa-solid fa-seedling"></i> For Farm Owners</span>
+            <h2 class="cta-heading">Are You a <span class="text-accent">Farmer?</span></h2>
+            <p class="cta-sub">Register your farmhouse and start earning additional income. Join India's fastest growing agro tourism platform.</p>
+            <button class="btn btn-cta" onclick="showToast('Farm registration form coming soon! We will contact you shortly.', 'success')">
+                <i class="fa-solid fa-plus me-2"></i>Add Your Farm
+            </button>
+        </div>
+    </div>
+</section>
+<!-- ========== CTA SECTION END ========== -->
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document
+        .getElementById("citySearchBox")
+        .addEventListener("input", function () {
+
+            this.value =
+                this.value
+                    .replace(/[^a-zA-Z\s]/g, '');
+
+        });
+    let selectedCityId = 0;
+    let currentIndex = -1;
+
+    $(document).ready(function () {
+
+        let today = new Date();
+
+        $('#checkinDate').datepicker({
+            format: 'dd-mm-yyyy',
+            autoHide: true,
+            startDate: today
+        }).on('change', function () {
+
+            let checkIn = $(this).datepicker('getDate');
+
+            $('#checkoutDate').datepicker('setStartDate', checkIn);
+
+        });
+
+        $('#checkoutDate').datepicker({
+            format: 'dd-mm-yyyy',
+            autoHide: true,
+            startDate: today
+        });
+
+        // CITY SUGGESTION
+        $("#citySearchBox").on("input", function () {
+
+            let value = $(this).val();
+
+            if (value.length < 2) {
+                $("#citySuggestions").hide();
+                return;
+            }
+
+            $.ajax({
+                url: '/Visitor/CitySuggestionSK',
+                type: 'GET',
+                data: { prefix: value },
+
+                success: function (data) {
+
+                    $("#citySuggestions").empty();
+
+                    $.each(data, function (i, city) {
+
+                        $("#citySuggestions").append(
+                            "<div class='suggestion-item' data-id='" + city.CityId + "'>" +
+                            city.CityName +
+                            "</div>"
+                        );
+
+                    });
+
+                    $("#citySuggestions").show();
+                }
+            });
+
+        });
+
+        // SELECT CITY
+        $(document).on("click", ".suggestion-item", function () {
+
+            $("#citySearchBox").val($(this).text());
+            selectedCityId = $(this).data("id");
+
+            $("#citySuggestions").hide();
+        });
+
+        // ARROW KEY SUPPORT
+        $("#citySearchBox").keydown(function (e) {
+
+            let items = $(".suggestion-item");
+
+            if (!items.length) return;
+
+            if (e.key === "ArrowDown") {
+                currentIndex++;
+            }
+
+            if (e.key === "ArrowUp") {
+                currentIndex--;
+            }
+
+            if (currentIndex >= items.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = items.length - 1;
+
+            items.removeClass("active");
+            items.eq(currentIndex).addClass("active");
+
+            if (e.key === "Enter") {
+
+                $("#citySearchBox").val(items.eq(currentIndex).text());
+                selectedCityId = items.eq(currentIndex).data("id");
+
+                $("#citySuggestions").hide();
+            }
+
+        });
+
+        // SEARCH BUTTON
+        $("#mainSearchBtn").click(function () {
+
+            let checkinRaw = $("#checkinDate").val();
+            let checkoutRaw = $("#checkoutDate").val();
+
+            if (selectedCityId == 0) {
+
+                showToast("Please select destination", "error");
+
+                return;
+
+            }
+
+            if (checkinRaw == "" || checkoutRaw == "") {
+
+                showToast("Please select check-in & check-out date", "warning");
+
+                return;
+
+            }
+
+            function convertDate(d) {
+
+                let parts = d.split("-");
+
+                return parts[2] + "-" + parts[1] + "-" + parts[0];
+
+            }
+
+            let checkin = convertDate(checkinRaw);
+            let checkout = convertDate(checkoutRaw);
+
+            showLoading(
+                "Searching farms",
+                "Finding best stays for you..."
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "/Visitor/SearchResultSK?cityId=" + selectedCityId +
+                    "&checkin=" + checkin +
+                    "&checkout=" + checkout;
+
+            }, 800);
+
+        });   // click close
+
+    });   // ⭐ document.ready close (ADD THIS)
+
+    $(document).click(function (e) {
+
+        if (!$(e.target)
+            .closest(".search-item")
+            .length) {
+
+            $("#citySuggestions").hide();
+
+        }
+
+    });
+
+</script>
+<script>
+function toggleWishlist(btn) {
+
+    let farmhousecode = btn.getAttribute("data-farm");
+
+    var isLoggedIn = '@(Session["VisitorCode"] != null ? "true" : "false")';
+
+    // login check
+    if (isLoggedIn === "false") {
+
+        var loginModal = new bootstrap.Modal(
+            document.getElementById('login-modal')
+        );
+        loginModal.show();
+
+        return;
+    }
+
+    // remove wishlist
+    if (btn.classList.contains("active")) {
+
+        $.ajax({
+            url: '/Visitor/RemoveFromWishlistSK',
+            type: 'POST',
+            data: { farmhousecode: farmhousecode }
+        });
+
+        btn.classList.remove("active");
+        btn.querySelector("i").classList.replace("bi-heart-fill", "bi-heart");
+        showToast("Removed from wishlist", "error");
+
+    }
+
+    // add wishlist
+    else {
+
+        $.ajax({
+            url: '/Visitor/AddToWishlistSK',
+            type: 'POST',
+            data: { farmhousecode: farmhousecode }
+        });
+
+        btn.classList.add("active");
+        btn.querySelector("i").classList.replace("bi-heart", "bi-heart-fill");
+        showToast("Added to wishlist", "success");
+    }
+}
+
+    function addOrRemoveWishlist(btn, farmhousecode) {
+
+        if (btn.classList.contains("active")) {
+
+            fetch('/Visitor/RemoveFromWishlistSK', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ farmhousecode: farmhousecode })
+            });
+
+            btn.classList.remove("active");
+            btn.querySelector("i").classList.replace("bi-heart-fill", "bi-heart");
+            showToast("Removed from wishlist", "error");
+
+        } else {
+
+            fetch('/Visitor/AddToWishlistSK', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ farmhousecode: farmhousecode })
+            });
+
+            btn.classList.add("active");
+            btn.querySelector("i").classList.replace("bi-heart", "bi-heart-fill");
+            showToast("Added to wishlist", "success");
+        }
+    }
+
+    window.addEventListener("scroll", function () {
+
+        let nav = document.getElementById("mainNavbar");
+
+        if (window.scrollY > 50) {
+
+            nav.classList.add("navbar-scrolled");
+
+        }
+        else {
+
+            nav.classList.remove("navbar-scrolled");
+
+        }
+
+    });
+</script>
+<script>
+
+    document.querySelectorAll('.stat-num').forEach(counter => {
+
+        let target = parseFloat(counter.getAttribute('data-target'));
+
+        let count = 0;
+
+        let speed = target / 50;
+
+        let update = () => {
+
+            if (count < target) {
+
+                count += speed;
+
+                counter.innerText = Math.floor(count);
+
+                requestAnimationFrame(update);
+
+            }
+            else {
+
+                counter.innerText = target;
+
+            }
+
+        };
+
+        update();
+
+    });
+
+</script>
+@*sweetalerts&toasters*@
+<script>
+    function showLoading(title, message) {
+
+        Swal.fire({
+
+            title: title,
+
+            html: `
+
+<div class="modern-loader">
+
+<div class="loader-ring"></div>
+
+<div class="loader-title">
+${title}
+</div>
+
+<div class="loader-text">
+${message}
+<span class="dots"></span>
+</div>
+
+</div>
+`,
+
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            background: "#ffffff",
+            width: 400
+
+        });
+
+    }
+    function showToast(message, type = "info") {
+
+        let container = document.getElementById("toastContainer");
+
+        let toast = document.createElement("div");
+
+        toast.className = "custom-toast toast-" + type;
+
+        let icon = "fa-circle-info";
+
+        if (type === "success") icon = "fa-check";
+        if (type === "error") icon = "fa-xmark";
+        if (type === "warning") icon = "fa-exclamation";
+
+        toast.innerHTML = `
+
+<div class="toast-icon">
+
+<i class="fa-solid ${icon}"></i>
+
+</div>
+
+<div>
+
+${message}
+
+</div>
+
+<div class="toast-close">
+
+<i class="fa-solid fa-xmark"></i>
+
+</div>
+
+<div class="toast-progress"></div>
+
+`;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+
+            toast.style.opacity = "0";
+
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+
+        }, 3000);
+
+        toast.querySelector(".toast-close").onclick = function () {
+
+            toast.remove();
+
+        }
+
+    }
+    function goToCity(url) {
+
+        showLoading(
+            "Loading destination",
+            "Opening farm listings..."
+        );
+
+        setTimeout(function () {
+
+            window.location.href = url;
+
+        }, 800);
+
+    }
+
+    function openFarm(url) {
+
+        showLoading(
+            "Loading farm",
+            "Opening farm details..."
+        );
+
+        // minimum 1 second loader
+        setTimeout(function () {
+
+            window.location.href = url;
+
+        }, 1000);
+
+    }
+</script>

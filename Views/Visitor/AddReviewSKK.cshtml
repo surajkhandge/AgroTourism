@@ -1,0 +1,204 @@
+﻿@model AgroClassLib.Visitor.AddReview
+
+@{
+    ViewBag.Title = "Add Review";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Add Review</h4>
+</div>
+
+<style>
+
+    .review-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+        font-size: 30px;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .star-rating input:checked ~ label {
+            color: gold;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: gold;
+        }
+
+    textarea {
+        resize: none;
+        border-radius: 8px;
+        padding: 15px;
+        border: 1px solid #ccc;
+    }
+
+    .char-counter {
+        font-size: 14px;
+        color: gray;
+        text-align: right;
+    }
+</style>
+
+<div class="review-container">
+
+    <h3 class="mb-3">Submit Your Review</h3>
+
+    @using (Html.BeginForm("AddReviewSKK", "Visitor", FormMethod.Post))
+    {
+
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.HiddenFor(m => m.FarmHouseCode)
+
+        <!-- Rating -->
+
+        <div class="form-group">
+
+            <label>Your Rating</label>
+
+            <div class="star-rating">
+
+                <input type="radio" id="star5" name="RatingCount" value="5" />
+                <label for="star5">★</label>
+
+                <input type="radio" id="star4" name="RatingCount" value="4" />
+                <label for="star4">★</label>
+
+                <input type="radio" id="star3" name="RatingCount" value="3" />
+                <label for="star3">★</label>
+
+                <input type="radio" id="star2" name="RatingCount" value="2" />
+                <label for="star2">★</label>
+
+                <input type="radio" id="star1" name="RatingCount" value="1" />
+                <label for="star1">★</label>
+
+            </div>
+
+            @Html.ValidationMessageFor(m => m.RatingCount, "", new { @class = "text-danger" })
+
+        </div>
+
+        <!-- Review -->
+
+        <div class="form-group mt-3">
+
+            <label>Review Comments</label>
+
+            @Html.TextAreaFor(m => m.ReviewComment, new
+            {
+                @class = "form-control",
+            rows = 6,
+            maxlength = "250",
+            id = "reviewComment",
+            placeholder = "Share your experience with us..."
+            })
+
+            <div class="char-counter">
+                <span id="charCount">0</span>/250 characters
+            </div>
+
+            @Html.ValidationMessageFor(m => m.ReviewComment, "", new { @class = "text-danger" })
+
+        </div>
+
+        <div class="form-group mt-3">
+
+            <input type="submit" value="Submit Review" class="btn btn-outline-success" />
+
+        </div>
+
+    }
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#reviewComment").on("input", function () {
+
+            $("#charCount").text($(this).val().length);
+
+        });
+
+    });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+
+Swal.fire({
+icon:'success',
+title:'Success',
+text:'@TempData["SuccessMessage"]',
+confirmButtonColor:'#28a745'
+});
+
+    </script>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("form").on("submit", function (e) {
+
+                // MVC validation check
+                if (!$(this).valid()) {
+                    return false;
+                }
+
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Review Submitted Successfully',
+                    text: 'Thank you for your feedback!',
+                    confirmButtonColor: '#28a745'
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        e.target.submit();
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+}

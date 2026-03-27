@@ -1,0 +1,263 @@
+﻿@{
+    ViewBag.Title = "FoodServices";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+@model AgroClassLib.Visitor.FoodPageVH
+
+<h2 class="fw-bold text-success mb-4">Food Services</h2>
+
+<h4 class="fw-semibold mb-4 text-muted"> These Are The Weekly Meal Preferences </h4>
+
+@using (Html.BeginForm("SaveFoodServicesVH", "Visitor", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.CheckIn)
+    @Html.HiddenFor(m => m.CheckOut)
+
+    <style>
+
+        /* Modal Styling */
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .image-modal {
+            background: #111;
+            border-radius: 12px;
+        }
+
+            .image-modal .modal-header {
+                color: white;
+            }
+
+            .image-modal .modal-title {
+                color: white;
+                font-weight: 600;
+            }
+
+            .image-modal .btn-close {
+                filter: invert(1);
+            }
+
+        .modal-backdrop.show {
+            opacity: 0.9;
+        }
+
+        .btn-close:hover {
+            transform: scale(1.2);
+        }
+
+        /* Menu Image */
+
+        .menu-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            transition: 0.4s;
+        }
+
+            .menu-image:hover {
+                transform: scale(1.05);
+            }
+
+        /* Food Card */
+
+        .food-card {
+            border-radius: 12px;
+            height: 100%;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+            .food-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+            }
+
+        /* Food Image */
+
+        .food-img {
+            height: 180px;
+            width: 100%;
+            overflow: hidden;
+            background: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+            .food-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s;
+            }
+
+        .food-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Badges */
+
+        .meal-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #198754;
+            color: white;
+            padding: 5px 12px;
+            font-size: 13px;
+            border-radius: 20px;
+        }
+
+        .time-badge {
+            background: #f1f1f1;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        /* Bottom Action Bar */
+
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 18px 0;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Continue Button */
+
+        .continue-btn {
+            background: #198754;
+            color: white;
+            font-size: 18px;
+            padding: 14px 40px;
+            border-radius: 40px;
+            border: none;
+            box-shadow: 0 6px 18px rgba(25,135,84,0.3);
+            transition: 0.3s;
+        }
+
+            .continue-btn:hover {
+                background: #157347;
+                transform: translateY(-2px);
+            }
+    </style>
+
+
+    <div class="row">
+
+        @for (int i = 0; i < Model.FoodItems.Count; i++)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card p-3 shadow-sm text-center">
+
+
+                    <div class="card food-card shadow-sm">
+
+                        <div class="food-img"
+                             onclick="openImage('@Url.Content("~/uploads/Common/Menus/" + Model.FoodItems[i].ImagePath)')">
+
+                            <img src="@Url.Content("~/uploads/Common/Menus/" + Model.FoodItems[i].ImagePath)" />
+
+                            <span class="meal-badge">
+                                @Model.FoodItems[i].MealName
+                            </span>
+
+                        </div>
+
+                        <div class="card-body text-center">
+
+                            <h5 class="fw-bold">@Model.FoodItems[i].FoodStyleName</h5>
+
+                            <p class="text-muted mb-1">
+                                @Model.FoodItems[i].MealName
+                            </p>
+
+                            <span class="time-badge">
+                                @Model.FoodItems[i].StartTime - @Model.FoodItems[i].EndTime
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    @Html.HiddenFor(m => m.FoodItems[i].FoodServiceCode)
+                    @Html.HiddenFor(m => m.FoodItems[i].MealTypeCode)
+                    @Html.HiddenFor(m => m.FoodItems[i].StartTime)
+                    @Html.HiddenFor(m => m.FoodItems[i].EndTime)
+                    @Html.HiddenFor(m => m.FoodItems[i].ImagePath)
+
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <div class="action-bar">
+
+        <button type="submit" class="btn continue-btn">
+            Continue to Guest Details →
+        </button>
+
+    </div>
+}
+
+
+
+@*//------------Image Modal Thats open the Menu-card ------------------//*@
+
+<div class="modal fade" id="imageModal" tabindex="-1">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+        <div class="modal-content image-modal">
+
+            <div class="modal-header border-0">
+
+                <h5 class="modal-title">Food Menu</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body text-center">
+
+                <img id="modalImage" class="menu-image" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@*------------JavaScript to handle image modal---------------*@
+
+<script>
+    function openImage(imagePath) {
+
+        const img = document.getElementById("modalImage");
+
+        img.style.opacity = 0;
+        img.src = imagePath;
+
+        var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        myModal.show();
+
+        setTimeout(() => {
+            img.style.opacity = 1;
+            img.style.transition = "0.4s";
+        }, 150);
+    }
+</script>

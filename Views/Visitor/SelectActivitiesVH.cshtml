@@ -1,0 +1,267 @@
+﻿
+@{
+    ViewBag.Title = "Select Activities";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+
+}
+
+@model AgroClassLib.Visitor.ActivityPageVH
+
+@using (Html.BeginForm("SaveActivitiesVH", "Visitor", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.CheckIn)
+    @Html.HiddenFor(m => m.CheckOut)
+
+    <style>
+
+        .booking-summary {
+            position: sticky;
+            top: 90px;
+            box-shadow: none !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
+        /* Activity Card */
+
+        .activity-card {
+            height: 100%;
+            border-radius: 12px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+            .activity-card .card-body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .activity-card .card-text {
+                flex-grow: 1;
+            }
+
+            .activity-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            }
+
+        /* Activity Image */
+
+        .activity-img {
+            height: 150px;
+            width: 100%;
+            overflow: hidden;
+            border-bottom: 1px solid #eee;
+        }
+
+            .activity-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s;
+            }
+
+        .activity-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Selection */
+
+        .activity-select {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .activity-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Selected Activity */
+
+        .activity-card.selected {
+            border: 2px solid #198754;
+            box-shadow: 0 5px 15px rgba(25,135,84,0.2);
+        }
+
+            .activity-card.selected::before {
+                content: "Selected";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: #28a745;
+                color: white;
+                text-align: center;
+                font-size: 14px;
+                padding: 3px;
+            }
+    </style>
+
+
+    <div class="container mt-4">
+
+        <div class="row">
+
+            <!-- LEFT SIDE ACTIVITIES -->
+            <div class="col-md-8">
+
+                <h3 class="mb-4 fw-bold text-success">Select Activities</h3>
+
+                <div class="row">
+
+                    @for (int i = 0; i < Model.Activities.Count; i++)
+                    {
+                        <div class="col-md-4 mb-4 d-flex">
+
+                            <div class="card shadow-sm activity-card w-100 d-flex flex-column">
+
+                                <div class="activity-img">
+
+                                    <img src="@Url.Content("~/uploads/Common/Activities/" + Model.Activities[i].ImagePath)"
+                                         class="img-fluid"
+                                         style="height:150px;width:100%;object-fit:cover;"
+                                         onerror="this.src='/Content/images/no-image.png'" />
+
+                                </div>
+
+                                <div class="card-body d-flex flex-column">
+
+                                    <h5 class="card-title">
+                                        @Model.Activities[i].ActivityServiceName
+                                    </h5>
+
+                                    <p class="card-text small text-muted flex-grow-1">
+                                        @Model.Activities[i].Description
+                                    </p>
+
+                                    <span class="badge bg-success fs-6">
+                                        Rs @Model.Activities[i].Price
+                                    </span>
+
+                                    @Html.HiddenFor(m => m.Activities[i].ActivityServiceCode)
+                                    @Html.HiddenFor(m => m.Activities[i].ActivityServiceName)
+                                    @Html.HiddenFor(m => m.Activities[i].Description)
+                                    @Html.HiddenFor(m => m.Activities[i].Price)
+
+                                    <div class="activity-select">
+
+                                        @Html.CheckBoxFor(
+                                            m => m.Activities[i].IsSelected,
+                                            new
+                                            {
+                                                @class = "activity-checkbox",
+                                                data_price = Model.Activities[i].Price
+                                            })
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT SIDE SUMMARY -->
+            <div class="col-md-4">
+
+                <div class="card shadow-sm p-3 booking-summary">
+
+                    <h4 class="mb-3">Booking Summary</h4>
+
+                    <p class="mb-2">
+                        <strong>Check-in:</strong>
+                        @Model.CheckIn.ToString("dd MMM yyyy")
+                    </p>
+
+                    <p class="mb-3">
+                        <strong>Check-out:</strong>
+                        @Model.CheckOut.ToString("dd MMM yyyy")
+                    </p>
+
+                    <hr />
+
+                    <h5>Total Estimated Price</h5>
+
+                    <h3 class="text-success" id="totalPrice">
+                        Rs 0
+                    </h3>
+
+                    <button type="submit" class="btn btn-success w-100 mt-3">
+                        Continue
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@*---------------// Include jQuery--------------------*@
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        function calculateTotal() {
+
+            var total = 0;
+
+            $(".activity-checkbox:checked").each(function () {
+
+                var price = parseFloat($(this).data("price"));
+
+                if (!isNaN(price)) {
+                    total += price;
+                }
+
+            });
+
+            $("#totalPrice").text("Rs " + total.toFixed(2));
+        }
+
+        $(".activity-checkbox").change(function () {
+
+            var card = $(this).closest(".activity-card");
+
+            if ($(this).is(":checked")) {
+                card.addClass("selected");
+            } else {
+                card.removeClass("selected");
+            }
+
+            calculateTotal();
+        });
+
+        calculateTotal();
+
+    });
+
+
+    $(".activity-checkbox").change(function () {
+
+        var card = $(this).closest(".activity-card");
+
+        if ($(this).is(":checked")) {
+            card.addClass("selected");
+        } else {
+            card.removeClass("selected");
+        }
+
+    });
+
+</script>

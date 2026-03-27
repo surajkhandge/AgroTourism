@@ -1,0 +1,223 @@
+﻿@model AgroClassLib.Visitor.BookingTP
+
+
+<style>
+
+    #invoiceArea {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+        #invoiceArea h6 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        #invoiceArea b {
+            color: #000;
+        }
+
+        #invoiceArea hr {
+            margin: 18px 0;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        /* Table Styling */
+
+        #invoiceArea table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+            #invoiceArea table thead {
+                background: linear-gradient(90deg,#1f3b63,#2f5d9a);
+                color: white;
+            }
+
+                #invoiceArea table thead th {
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+
+            #invoiceArea table tbody td {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+        /* Total Section */
+
+        #invoiceArea .text-end h5 {
+            background: #f8f9fa;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: 1px solid #e5e5e5;
+        }
+
+    /* Buttons */
+
+    .btn-success {
+        background: linear-gradient(90deg,#28a745,#1e7e34);
+        border: none;
+        font-weight: 500;
+    }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+    }
+
+    /* Print */
+
+    @@media print {
+
+        body {
+            background: white;
+        }
+
+        #invoiceArea {
+            box-shadow: none;
+            border: none;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="container-fluid" id="invoiceArea">
+
+    <!-- HEADER -->
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+            <h6><b>Invoice Code :</b> @Model.InvoiceCode</h6>
+            <h6><b>Issue Date :</b> @(Model.IssueDate == DateTime.MinValue ? "" : Model.IssueDate.ToString("dd-MM-yyyy"))</h6>
+        </div>
+
+        <div class="col-md-6 text-end">
+            <h6><b>Booking Code :</b> @Model.BookingCode</h6>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <!-- BILLING DETAILS -->
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+
+            <h6 class="fw-bold">Billed From</h6>
+
+            <b>@Model.FarmHouseName</b><br />
+            @Model.FarmAddress
+
+        </div>
+
+        <div class="col-md-6">
+
+            <h6 class="fw-bold">Billed To</h6>
+
+            <b>@Model.VisitorName</b><br />
+            @Model.Email<br />
+            @Model.MobileNo<br />
+            @Model.VAddress
+
+        </div>
+
+    </div>
+
+    <hr />
+
+    <!-- INVOICE TABLE -->
+    <table class="table table-bordered">
+
+        <thead class="table-light">
+            <tr>
+                <th>Description</th>
+                <th class="text-end">Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>@Model.Description</td>
+                <td class="text-end">₹ @Model.Amount</td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+    <!-- TOTAL -->
+    <div class="text-end mt-3">
+        <h5>Total : ₹ @Model.TotalAmount</h5>
+    </div>
+
+</div>
+
+
+<!-- BUTTONS -->
+<div class="text-end mt-4 no-print">
+
+    <button class="btn btn-success me-2" onclick="downloadInvoice()">
+        <i class="bi bi-file-earmark-pdf"></i> Download PDF
+    </button>
+
+    <button type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal">
+        Close
+    </button>
+
+</div>
+
+
+<script>
+
+    function downloadInvoice() {
+
+        var invoiceContent = document.getElementById("invoiceArea").innerHTML;
+
+        var printWindow = window.open('', '', 'width=900,height=700');
+
+        printWindow.document.write('<html><head><title>Invoice</title>');
+
+        printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">');
+
+        printWindow.document.write('</head><body style="padding:20px;">');
+
+        printWindow.document.write(invoiceContent);
+
+        printWindow.document.write('</body></html>');
+
+        printWindow.document.close();
+
+        printWindow.print();
+    }
+
+</script>
+
+
+<style>
+
+    @@media print {
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+

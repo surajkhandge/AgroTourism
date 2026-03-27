@@ -1,0 +1,352 @@
+﻿@model AgroClassLib.Visitor.ConfirmBookingVM
+
+@{
+    ViewBag.Title = "Confirm Booking";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+<style>
+    .booksummrybox {
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .card:hover,
+    .container:hover,
+    .room-card:hover {
+        box-shadow: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+</style>
+<div class="container booksummrybox mt-5 mb-5">
+
+    <div class="card shadow p-4" style="border-radius:10px;">
+
+        <h3 class="fw-bold mb-1">
+            Confirm Booking Summary
+        </h3>
+
+        <p class="text-muted">
+            Please review your booking details before confirming.
+        </p>
+
+        <hr />
+
+        <!-- FARM DETAILS -->
+
+        <h5 class="fw-bold">Farmhouse Details</h5>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="text-muted">Farmhouse</div>
+
+                <div class="fw-bold">
+                    @Model.FarmHouseName
+                </div>
+
+            </div>
+
+            <div class="col-md-6 text-end">
+
+                <div class="text-muted">Location</div>
+
+                <div class="fw-bold">
+                    @Model.Location
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr />
+
+        <!-- VISIT -->
+
+        <h5 class="fw-bold">Visit Dates</h5>
+
+        <div class="row text-center">
+
+            <div class="col-md-4">
+
+                <div class="text-muted">Check-in</div>
+
+                <div class="fw-bold">
+                    @Model.CheckIn.ToString("dd MMM yyyy")
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="text-muted">Check-out</div>
+
+                <div class="fw-bold">
+                    @Model.CheckOut.ToString("dd MMM yyyy")
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="text-muted">Total Nights</div>
+
+                <div class="fw-bold">
+                    @Model.Nights
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr />
+
+        <!-- PACKAGE -->
+
+        @if (Model.IsPackageBooking)
+        {
+
+            <h5 class="fw-bold">Package Details</h5>
+
+            <div class="mb-3">
+
+                <div class="fw-bold text-success">
+                    @Model.PackageName
+                </div>
+
+                <div class="text-muted">
+                    @Model.Nights Nights
+                </div>
+
+            </div>
+
+            <table class="table">
+
+                <tr>
+                    <td width="30%">Room Type</td>
+
+                    <td>
+                        @Model.RoomTypeName
+                        <span class="text-muted">(Included in package)</span>
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Meals</td>
+
+                    <td>
+                        @Model.MealTypeName
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Activities</td>
+
+                    <td>
+
+                        @foreach (var act in Model.Activities)
+                        {
+                            <div>@act.ActivityServiceName</div>
+                        }
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        }
+        else
+        {
+
+            <h5 class="fw-bold">Rooms Selected</h5>
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+                        <th>Room</th>
+
+                        <th>Qty</th>
+
+                        <th class="text-end">Price</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var room in Model.Rooms)
+                    {
+
+                        <tr>
+
+                            <td>
+                                @room.RoomTypeName
+                            </td>
+
+                            <td>
+                                @room.Quantity
+                            </td>
+
+                            <td class="text-end">
+
+                                Rs @(room.PricePerNight * room.Quantity)
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+
+            <h5 class="fw-bold">Activities</h5>
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Activity</th>
+
+                        <th class="text-end">Price</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var act in Model.Activities)
+                    {
+
+                        <tr>
+
+                            <td>
+                                @act.ActivityServiceName
+                            </td>
+
+                            <td class="text-end">
+
+                                Rs @act.Price
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        }
+        <hr />
+
+        <!-- PRICE -->
+
+        @if (Model.IsPackageBooking)
+        {
+
+            <h5 class="fw-bold">Price Summary</h5>
+
+            <table class="table">
+
+                <tr>
+
+                    <td>Package Price</td>
+
+                    <td>
+                        ₹@Model.PackagePrice
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+
+                        Discount (@Model.DiscountPercent%)
+
+                    </td>
+
+                    <td class="text-danger">
+
+                        - ₹@Model.DiscountAmount
+
+                    </td>
+
+                </tr>
+
+                <tr class="fw-bold">
+
+                    <td>Final Amount</td>
+
+                    <td class="text-success">
+
+                        ₹@Model.FinalPrice
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        }
+        else
+        {
+
+            <h5>Total Cost</h5>
+
+            <h4 class="text-success">
+
+                Rs @Model.TotalCost
+
+            </h4>
+
+        }
+        <!--<hr />-->
+        <!-- PAYMENT -->
+        <!--<h5 class="fw-bold">Payment</h5>
+
+        <div class="text-muted">
+
+            Payment Mode : Pay at Property
+
+        </div>-->
+        <!--<hr />-->
+
+        <div class="d-flex justify-content-end">
+
+            <a href="@Url.Action("FarmDetailsSK","Visitor",
+new { id = Model.FarmHouseCode })"
+               class="btn btn-outline-danger btn-rounded me-2">
+
+                <i class="fa fa-times"></i>
+                Cancel
+
+            </a>
+
+            <a class="btn btn-outline-success btn-rounded px-4" href="@Url.Action("ConfirmBook", "Visitor")">
+                <i class="fas fa-check"></i>
+                Confirm Booking
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

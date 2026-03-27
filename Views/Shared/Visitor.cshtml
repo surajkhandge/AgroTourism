@@ -1,0 +1,264 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - AgroTrip India</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" />
+    <!-- SweetAlert -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+    <link href="~/Content/CSS/Visitor.css" rel="stylesheet" />
+</head>
+
+<body class="@(ViewBag.Title == "Home" ? "home-page" : "other-page")">
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+
+        <div class="container">
+
+            <a class="navbar-brand d-flex align-items-center gap-2"
+               href="@Url.Action("Home","Visitor")">
+
+                <span class="brand-icon">
+                    <i class="fa-solid fa-seedling"></i>
+                </span>
+
+                <span class="brand-text">
+                    AgroTrip <span class="brand-accent">India</span>
+                </span>
+
+            </a>
+
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navMenu">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+
+            <div class="collapse navbar-collapse"
+                 id="navMenu">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home","Visitor")">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#destinations">Destinations</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#farmhouses">Farmhouses</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#experiences">Experiences</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#activities">Activities</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reviews">Reviews</a>
+                    </li>
+
+                    @if (Session["VisitorCode"] == null)
+                    {
+                        <li class="nav-item ms-lg-3">
+
+                            <a class="btn btn-nav-primary"
+                               href="@Url.Action("Index","Home")">
+
+                                Login
+
+                            </a>
+
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown ms-lg-3">
+
+                            <a class="nav-link dropdown-toggle"
+                               data-bs-toggle="dropdown">
+
+                                <i class="fa-solid fa-circle-user"></i>
+
+                                @(Session["VisitorName"])
+
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="@Url.Action("VisitorProfileAA","Visitor")">
+                                        <i class="fa-solid fa-circle-user me-2"></i>My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="@Url.Action("MyBookingsTP","Visitor")">
+                                        <i class="fa-solid fa-calendar-check me-2"></i>My Bookings
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="@Url.Action("WishlistSK","Visitor")">
+                                        <i class="fa-solid fa-heart me-2 text-danger"></i> Wishlist
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item text-danger"
+                                       href="@Url.Action("Logout","Home")">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </li>
+                    }
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </nav>
+    <!-- ================= HERO SECTION ================= -->
+    <!-- ================= MAIN BODY ================= -->
+    <div class="content-area">
+        @RenderBody()
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <div class="container">
+
+            <div class="row gy-5 text-white">
+
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo-box me-3">AI</div>
+                        <h5 class="mb-0 fw-bold text-white">AgroTrip India</h5>
+                    </div>
+
+                    <p class="footer-text">
+                        Discover the perfect farmhouse retreat for your next escape.
+                    </p>
+
+                    <div class="d-flex gap-3 mt-3">
+                        <i class="bi bi-facebook fs-5"></i>
+                        <i class="bi bi-twitter fs-5"></i>
+                        <i class="bi bi-instagram fs-5"></i>
+                        <i class="bi bi-linkedin fs-5"></i>
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <h6 class="fw-bold mb-3">Company</h6>
+                    <a href="#" class="footer-link">About Us</a>
+                    <a href="#" class="footer-link">Careers</a>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Cancellation Options</a>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="fw-bold mb-3">Discover</h6>
+                    <a href="#" class="footer-link">Trust & Safety</a>
+                </div>
+
+            </div>
+
+            <hr class="footer-divider" />
+
+            <div class="text-center footer-copy">
+                © 2026 AgroTrip India. All rights reserved.
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="~/Content/js/Visitor.js"></script>
+    <script>
+
+@if(TempData["Login"]!=null)
+{
+<text>
+Swal.fire({
+icon:'success',
+title:'Welcome @Session["VisitorName"]',
+timer:2000,
+showConfirmButton:false
+});
+</text>
+}
+
+@if(TempData["Logout"]!=null)
+{
+<text>
+Swal.fire({
+icon:'success',
+title:'Logout Successfully',
+timer:2000,
+showConfirmButton:false
+});
+</text>
+}
+
+
+
+    </script>
+</body>
+</html>

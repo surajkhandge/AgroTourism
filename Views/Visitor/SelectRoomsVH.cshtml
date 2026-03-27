@@ -1,0 +1,383 @@
+﻿@model AgroClassLib.Visitor.RoomBookingVH
+
+@{
+    ViewBag.Title = "Select Rooms";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" />
+
+<style>
+    .room-card {
+        border-radius: 10px;
+    }
+
+        .room-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+
+    .datepicker-dropdown {
+        z-index: 9999 !important;
+    }
+
+    .datepicker-container {
+        z-index: 9999 !important;
+    }
+
+    .sticky-top {
+        overflow: visible !important;
+    }
+
+    .card:hover,
+    .container:hover,
+    .room-card:hover {
+        box-shadow: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">Select Rooms</h3>
+
+    @using (Html.BeginForm("SaveBookingVH", "Visitor", FormMethod.Post))
+    {
+
+        <div class="row">
+
+            <!-- LEFT SIDE - ROOMS -->
+            <div class="col-md-8">
+
+                @for (int i = 0; i < Model.Rooms.Count; i++)
+                {
+                    <div class="card mb-3 shadow-sm room-card">
+
+                        <div class="card-body">
+
+                            <div class="row align-items-center">
+
+                                <div class="col-md-8">
+
+                                    <h5 class="mb-2">@Model.Rooms[i].RoomTypeName Room</h5>
+
+                                    <div class="row small text-muted">
+
+                                        <div class="col-6">
+                                            Guests : <b>@Model.Rooms[i].NumberOfGuests</b>
+                                        </div>
+
+                                        <div class="col-6">
+                                            Price : <b>₹ @Model.Rooms[i].PricePerNight / night</b>
+                                        </div>
+
+                                        <div class="col-6 mt-1">
+                                            Available : <b>@Model.Rooms[i].TotalRooms</b>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="small">Quantity</label>
+
+                                    @if (Model.Rooms[i].TotalRooms == 0)
+                                    {
+                                        @Html.TextBoxFor(m => m.Rooms[i].Quantity,
+                                        new
+                                        {
+                                            @class = "form-control roomQty",
+                                            type = "number",
+                                            min = "0",
+                                            step = "1",
+                                            max = Model.Rooms[i].TotalRooms,
+                                            data_max = Model.Rooms[i].TotalRooms
+                                        })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.Rooms[i].Quantity,
+                                        new
+                                        {
+                                            @class = "form-control roomQty",
+                                            type = "number",
+                                            min = "0",
+                                            step = "1",
+                                            max = Model.Rooms[i].TotalRooms,
+                                            data_max = Model.Rooms[i].TotalRooms
+                                        })
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <!-- Hidden Fields -->
+                            @Html.HiddenFor(m => m.Rooms[i].RoomTypeCode)
+                            @Html.HiddenFor(m => m.Rooms[i].RoomTypeName)
+                            @Html.HiddenFor(m => m.Rooms[i].NumberOfGuests)
+                            @Html.HiddenFor(m => m.Rooms[i].PricePerNight)
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- RIGHT SIDE - BOOKING SUMMARY -->
+            <div class="col-md-4">
+
+                <div class="card p-4 shadow-sm sticky-top" style="top:20px">
+
+                    <h4 class="mb-3">Booking Dates</h4>
+
+                    <div class="mb-3">
+                        <label>Check In</label>
+                        @Html.TextBoxFor(m => m.CheckIn, "{0:dd-MM-yyyy}",
+                        new
+                        {
+                            @class = "form-control",
+                            @id = "checkIn",
+                            @placeholder = "Select Check In"
+                        })
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Check Out</label>
+                        @Html.TextBoxFor(m => m.CheckOut, "{0:dd-MM-yyyy}",
+                        new
+                        {
+                            @class = "form-control",
+                            @id = "checkOut",
+                            @placeholder = "Select Check Out"
+                        })
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-success w-100">
+                        Continue
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+
+
+<script>
+    document.querySelectorAll(".roomQty").forEach(function (input) {
+
+        input.addEventListener("input", function () {
+
+            let max = parseInt(this.getAttribute("data-max"));
+            let value = parseInt(this.value);
+
+            if (value > max) {
+
+                this.value = max;   // auto correct value
+                this.style.border = "2px solid red";
+
+            } else {
+
+                this.style.border = "";
+
+            }
+
+        });
+
+    });
+
+    document.querySelectorAll(".roomQty").forEach(function (input) {
+
+        input.addEventListener("keydown", function (e) {
+
+            if (this.value.length > 1) {
+                let max = parseInt(this.getAttribute("data-max"));
+
+                if (parseInt(this.value + e.key) > max) {
+                    e.preventDefault();
+                }
+            }
+
+        });
+
+    });
+</script>
+
+
+<script>
+
+    const checkIn = document.getElementById("CheckIn");
+    const checkOut = document.getElementById("CheckOut");
+
+    let today = new Date().toISOString().split('T')[0];
+
+    checkIn.setAttribute("min", today);
+
+    checkIn.addEventListener("change", function () {
+
+        if (checkIn.value) {
+            checkOut.setAttribute("min", checkIn.value);
+        }
+
+    });
+
+</script>
+<script>
+
+    $(document).ready(function () {
+
+        var today = new Date();
+
+        $('#checkIn').datepicker({
+            autoHide: true,
+            format: 'dd-mm-yyyy',
+            startDate: today
+        });
+
+        $('#checkOut').datepicker({
+            autoHide: true,
+            format: 'dd-mm-yyyy',
+            startDate: today
+        });
+
+        $('#checkIn').on('change', function () {
+
+            var checkInDate = $('#checkIn').datepicker('getDate');
+
+            $('#checkOut').datepicker('setStartDate', checkInDate);
+
+        });
+
+    });
+
+</script>
+<script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+
+        const rooms = document.querySelectorAll(".roomQty");
+        const checkIn = document.getElementById("CheckIn");
+        const checkOut = document.getElementById("CheckOut");
+
+        let selected = false;
+
+        rooms.forEach(function (r) {
+
+            let value = parseInt(r.value) || 0;
+
+            if (value > 0) {
+                selected = true;
+            }
+
+        });
+
+        let checkInDate = new Date(checkIn.value);
+        let checkOutDate = new Date(checkOut.value);
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkInDate < today) {
+
+            e.preventDefault();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Check In',
+                text: 'Check In date must be today or later.',
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+
+            return;
+        }
+
+        if (checkOutDate <= checkInDate) {
+
+            e.preventDefault();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Check Out',
+                text: 'Check Out must be after Check In date.',
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+
+            return;
+        }
+
+        //if (!selected) {
+
+        //    e.preventDefault();
+
+        //    rooms.forEach(function (r) {
+        //        r.style.border = "2px solid red";
+        //    });
+
+        //    Swal.fire({
+        //        icon: 'warning',
+        //        title: 'Room Required',
+        //        text: 'Please select at least one room.',
+        //        timer: 5000,
+        //        timerProgressBar: true,
+        //        showConfirmButton: false
+        //    });
+
+        //    return false;
+        //}
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $("form").on("submit", function (e) {
+
+            var selected = false;
+
+            $(".roomQty").each(function () {
+
+                var value = parseInt($(this).val()) || 0;
+
+                if (value > 0) {
+                    selected = true;
+                }
+
+            });
+
+            if (!selected) {
+
+                e.preventDefault(); // stop form submit
+
+                $(".roomQty").css("border", "2px solid red");
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Room Required',
+                    text: 'Please select at least one room.',
+                    timer: 5000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+
+                return false;
+            }
+
+        });
+
+    });
+</script>

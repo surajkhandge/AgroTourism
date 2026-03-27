@@ -1,0 +1,517 @@
+﻿@model AgroClassLib.Visitor.RegistrationVH
+
+@{
+    ViewBag.Title = "Visitor Registration";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<style>
+
+    body {
+        background: linear-gradient(135deg,#d4fc79,#96e6a1);
+    }
+
+    /* Glass Card */
+
+    .register-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    /* Inputs */
+
+    .form-control {
+        border-radius: 10px;
+        height: 45px;
+    }
+
+
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.15rem rgba(40,167,69,.25);
+        }
+
+    /* Register Button */
+
+    .btn-register {
+        background: linear-gradient(135deg,#28a745,#20c997);
+        border: none;
+        padding: 12px 40px;
+        font-size: 18px;
+        border-radius: 30px;
+        transition: 0.3s;
+    }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+    /* OTP Modal */
+
+    .otp-box {
+        width: 45px;
+        height: 50px;
+        font-size: 22px;
+        text-align: center;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin: 5px;
+    }
+
+        .otp-box:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40,167,69,.4);
+        }
+
+    .modal-content {
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    .otp-title {
+        font-weight: 600;
+        color: #28a745;
+    }
+
+    .resend {
+        cursor: pointer;
+        color: #28a745;
+        font-size: 14px;
+    }
+
+    .input-validation-error {
+        border: 2px solid red !important;
+    }
+
+    .field-validation-error {
+        color: red;
+        font-size: 13px;
+    }
+
+    .input-validation-error {
+        border: 2px solid red !important;
+    }
+
+    .field-validation-error {
+        color: red;
+        font-size: 13px;
+    }
+</style>
+
+<div class="container mt-5">
+
+    <div class="register-card">
+
+        <h3 class="text-center mb-4 fw-bold text-success">
+            Visitor Registration
+        </h3>
+
+        @using (Html.BeginForm("VisitorRegistrationVH", "Visitor", FormMethod.Post, new { autocomplete = "off" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label>Full Name</label>
+                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter Full Name" })
+                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Mobile Number</label>
+
+                    @Html.TextBoxFor(m => m.MobileNumber, new
+               {
+                   @class = "form-control",
+                   placeholder = "Enter Mobile Number",
+                   maxlength = "10",
+                   pattern = "[0-9]{10}",
+                   oninput = "this.value = this.value.replace(/[^0-9]/g,'')"
+               })
+
+                    @Html.ValidationMessageFor(m => m.MobileNumber, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Email Address</label>
+                    @Html.TextBoxFor(m => m.EmailAddress, new { @class = "form-control", placeholder = "Enter Email Address" })
+                    @Html.ValidationMessageFor(m => m.EmailAddress, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="d-block">Gender</label>
+
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButtonFor(m => m.Gender, "Male", new { @class = "form-check-input" })
+                        <label>Male</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButtonFor(m => m.Gender, "Female", new { @class = "form-check-input" })
+                        <label>Female</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButtonFor(m => m.Gender, "Other", new { @class = "form-check-input" })
+                        <label>Other</label>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>Country</label>
+                    @Html.DropDownListFor(model => model.CountryId, ViewBag.CountryId as IEnumerable<SelectListItem>, "Select Country", new { @class = "form-control", id = "CountryId", required = "required" })
+                    @Html.ValidationMessageFor(m => m.CountryId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>State</label>
+                    @Html.DropDownListFor(m => m.StateId, new SelectList(Enumerable.Empty<SelectListItem>()), "Select State", new { @class = "form-control", id = "StateId" })
+
+                    @Html.ValidationMessageFor(m => m.StateId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>City</label>
+                    @Html.DropDownListFor(m => m.CityId, new SelectList(Enumerable.Empty<SelectListItem>()), "Select City", new { @class = "form-control", id = "CityId" })
+
+                    @Html.ValidationMessageFor(m => m.CityId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Pincode</label>
+                    @Html.TextBoxFor(m => m.Pincode, new
+                    { @class = "form-control", maxlength = "6", onkeypress = "return onlyNumber(event)" })
+                    @Html.ValidationMessageFor(m => m.Pincode, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Aadhar Card</label>
+                    @Html.TextBoxFor(m => m.AdharCardNo, new
+                    { @class = "form-control", maxlength = "12", onkeypress = "return onlyNumber(event)" })
+                    @Html.ValidationMessageFor(m => m.AdharCardNo, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label>Address</label>
+                    @Html.TextAreaFor(m => m.Address, new
+                    { @class = "form-control", maxlength = "200", rows = "3" })
+                    @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Password</label>
+
+                    <div class="input-group">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "Password" })
+
+                        <span class="input-group-text"
+                              onclick="togglePassword('Password',this)"
+                              style="cursor:pointer">
+
+                            <i class="bi bi-eye"></i>
+                        </span>
+                    </div>
+
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Confirm Password</label>
+
+                    <div class="input-group">
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", id = "ConfirmPassword" })
+
+                        <span class="input-group-text"
+                              onclick="togglePassword('ConfirmPassword',this)"
+                              style="cursor:pointer">
+
+                            <i class="bi bi-eye"></i>
+                        </span>
+                    </div>
+
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+
+                </div>
+
+                <div class="col-md-12 text-center mt-3">
+
+                    <button type="submit"
+                            id="btnRegister"
+                            class="btn btn-register">
+
+                        Register
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        }
+
+    </div>
+</div>
+
+
+<!-- OTP MODAL -->
+
+<div class="modal fade" id="otpModal">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content text-center">
+
+            <h4 class="otp-title mb-2">
+                OTP Verification
+            </h4>
+
+            <p class="text-muted">
+                Enter the 6 digit OTP sent to your mobile
+            </p>
+
+            <div class="d-flex justify-content-center mb-3">
+
+                <input class="otp-box" maxlength="1" id="otp1">
+                <input class="otp-box" maxlength="1" id="otp2">
+                <input class="otp-box" maxlength="1" id="otp3">
+                <input class="otp-box" maxlength="1" id="otp4">
+                <input class="otp-box" maxlength="1" id="otp5">
+                <input class="otp-box" maxlength="1" id="otp6">
+
+            </div>
+
+            <span id="otpError" class="text-danger"></span>
+
+            <div class="mt-3">
+
+                <button id="verifyOtpBtn"
+                        class="btn btn-success px-4">
+
+                    Verify OTP
+
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+@Scripts.Render("~/bundles/jqueryval")
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+$(document).ready(function () {
+
+    /* COUNTRY → STATE */
+
+    $('#CountryId').change(function () {
+
+        var CountryId = $(this).val();
+
+        $('#StateId').empty().append('<option value="">Select State</option>');
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (!CountryId) return;
+
+        $.get('@Url.Action("GetStatesAjaxVH","Visitor")',
+        { CountryId: CountryId },
+
+        function (data) {
+
+            $.each(data, function (i, state) {
+
+                $("#StateId").append('<option value="' + state.StateId + '">' + state.StateName + '</option>');
+
+            });
+
+        });
+
+    });
+
+
+    /* STATE → CITY */
+
+    $('#StateId').change(function () {
+
+        var StateId = $(this).val();
+
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (!StateId) return;
+
+        $.get('@Url.Action("GetCitiesAjaxVH","Visitor")',
+        { StateId: StateId },
+
+        function (data) {
+
+            $.each(data, function (i, city) {
+
+                $('#CityId').append('<option value="' + city.CityId + '">' + city.CityName + '</option>');
+
+            });
+
+        });
+
+    });
+
+
+    /* REGISTER BUTTON → SEND OTP */
+
+   $("form").submit(function (e) {
+
+    e.preventDefault(); // stop normal form submission
+
+    var form = $(this);
+
+    // run MVC validation
+    if (!form.valid()) {
+        return;
+    }
+
+    var formData = form.serialize();
+
+    $.ajax({
+
+        url: '@Url.Action("SendOTPVH","Visitor")',
+        type: "POST",
+        data: formData,
+
+        success: function (res) {
+
+            if (res.success) {
+
+                var otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+                otpModal.show();
+
+            }
+            else {
+
+                alert(res.message);
+
+            }
+
+        }
+
+    });
+
+});
+
+
+    /* VERIFY OTP */
+
+    $("#verifyOtpBtn").click(function () {
+
+        var otp =
+        $("#otp1").val() +
+        $("#otp2").val() +
+        $("#otp3").val() +
+        $("#otp4").val() +
+        $("#otp5").val() +
+        $("#otp6").val();
+
+        if (otp.length != 6) {
+
+            $("#otpError").text("Please enter complete OTP");
+            return;
+
+        }
+
+        $.ajax({
+
+            url: '@Url.Action("VerifyOTPVH","Visitor")',
+            type: "POST",
+            data: { otp: otp },
+
+            success: function (res) {
+
+                if (res.success) {
+
+                    Swal.fire({
+                    title: 'Success 🎉',
+                    text: 'Redirecting to login...',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '@Url.Action("Index","FarmOwner")';
+                    });
+
+                }
+                else {
+
+                    $("#otpError").text("Invalid OTP");
+
+                }
+
+            }
+
+        });
+
+    });
+
+
+    /* OTP AUTO MOVE */
+
+    $('.otp-box').keyup(function () {
+
+        if (this.value.length == 1) {
+
+            $(this).next('.otp-box').focus();
+
+        }
+
+    });
+
+});
+
+
+/* PASSWORD SHOW / HIDE */
+
+function togglePassword(fieldId, iconContainer) {
+
+    var input = document.getElementById(fieldId);
+    var icon = iconContainer.querySelector("i");
+
+    if (input.type === "password") {
+
+        input.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+
+    }
+    else {
+
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+
+    }
+
+        }
+
+        function onlyNumber(evt) {
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+
+            return true;
+        }
+
+</script>
+

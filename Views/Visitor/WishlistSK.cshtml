@@ -1,0 +1,480 @@
+﻿
+@{
+    ViewBag.Title = "Wishlist";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+@*<h2>Wishlist</h2>*@
+@model List<AgroClassLib.Visitor.VisitorSK>
+
+@*<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>*@
+
+@Styles.Render("~/Content/CSS/Visitor.css")
+<style>
+    .farm-card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .image-wrapper {
+        position: relative;
+    }
+
+    .wishlist-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #fff;
+        border: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .wishlist-btn i {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .wishlist-btn.active i {
+            color: red;
+        }
+
+    .rating-badge {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: #f4a300;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .view-btn {
+        border: 2px solid #1F4D3A;
+        border-radius: 25px;
+        padding: 6px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        background: transparent;
+        color: #1F4D3A !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+    }
+
+        .view-btn:hover {
+            background: #1F4D3A;
+            color: #fff !important;
+        }
+
+    .view-all-link {
+        color: #1F4D3A;
+        font-weight: 500;
+        font-size: 16px;
+        text-decoration: none;
+        transition: 0.3s ease;
+        display: flex;
+        align-items: center;
+        font-family: sans-serif;
+    }
+
+        .view-all-link i {
+            transition: 0.3s ease;
+        }
+
+        .view-all-link:hover {
+            color: #F4A300;
+        }
+
+            .view-all-link:hover i {
+                transform: translateX(4px);
+            }
+
+    .wishlist-section {
+        background: #f7faf8;
+        min-height: calc(100vh - 140px);
+        padding: 40px 0;
+    }
+
+    .wishlist-header {
+        margin-bottom: 30px;
+    }
+
+        .wishlist-header h2 {
+            font-weight: 700;
+            color: #1b4332;
+        }
+
+        .wishlist-header p {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+    .empty-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+    }
+
+    .empty-card {
+        background: white;
+        padding: 35px 40px;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        text-align: center;
+        max-width: 380px;
+        width: 100%;
+        transition: 0.3s;
+    }
+
+        .empty-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        background: #edf7f2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        margin-bottom: 15px;
+    }
+
+        .empty-icon i {
+            font-size: 30px;
+            color: #2d6a4f;
+        }
+
+    .empty-card h3 {
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #1e2a28;
+    }
+
+    .empty-card p {
+        color: #6c757d;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .empty-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .main-btn {
+        border-radius: 30px;
+        padding: 12px 26px;
+        font-weight: 600;
+    }
+
+        .main-btn:hover {
+            transform: translateY(-2px);
+        }
+</style>
+<div id="toastContainer" class="toast-container"></div>
+<section class="wishlist-section">
+
+
+    <div class="container">
+
+        <div class="wishlist-header">
+
+            <h2>
+                <i class="bi bi-heart"></i>
+                My Wishlist
+            </h2>
+
+            <p>
+                Your saved farmhouses appear here
+            </p>
+
+        </div>
+        @*<div class="d-flex justify-content-between align-items-end mb-4">
+                <h2 class="h2 fw-bold mb-0">My Wishlist</h2>
+            </div>*@
+
+        <div class="row" id="wishlistContainer">
+
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-6 col-lg-3 mb-4 d-flex">
+
+                    <div class="card shadow-sm w-100 border-0 farm-card">
+
+                        <!-- IMAGE WRAPPER -->
+                        <div class="image-wrapper">
+
+                            <img class="card-img-top img-fluid"
+                                 src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+                                 style="height:220px; object-fit:cover;" />
+
+                            <!-- ❤️ Wishlist Button -->
+                            <button class="wishlist-btn active"
+                                    data-farm="@item.FarmHouseCode"
+                                    onclick="removeFromWishlist(this)">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+
+                            <!-- ⭐ Rating Badge -->
+                            <div class="rating-badge">
+                                <i class="bi bi-star-fill"></i>
+                                @item.AvgRating
+                            </div>
+
+                        </div>
+
+                        <!-- CARD BODY -->
+                        <div class="card-body d-flex flex-column">
+
+                            <h5 class="card-title fw-bold mb-1">
+                                @item.FarmHouseName
+                            </h5>
+
+                            <p class="text-muted small mb-3">
+                                @item.CityName
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+
+                                <div>
+                                    <span class="fw-bold text-warning">
+                                        ₹@item.LowestPrice
+                                    </span>
+                                    <small class="text-muted"> / night</small>
+                                </div>
+
+                                <a class="btn view-btn" onclick="openFarm('@Url.Action("FarmDetailsSK","Visitor", new { id = item.FarmHouseCode })')">
+                                    View Details
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+    <div id="emptyWishlist"
+         class="empty-state"
+         style="display:@(Model.Any() ? "none" : "flex")">
+
+        <div class="empty-card">
+
+            <div class="empty-icon">
+                <i class="bi bi-heart"></i>
+            </div>
+
+            <h3>No saved farmhouses yet</h3>
+
+            <p>
+                Tap the heart icon to save places you love.
+                <br>
+                Plan your perfect agro escape.
+            </p>
+
+            <div class="empty-actions">
+
+                <a href="/Visitor/FarmHousesListSK"
+                   class="btn btn-success main-btn">
+
+                    <i class="bi bi-search"></i>
+                    Explore Farmhouses
+
+                </a>
+
+                <a href="/Visitor/Home"
+                   class="btn btn-light">
+
+                    Back to Home
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function removeFromWishlist(btn) {
+
+        let farmhousecode = btn.getAttribute("data-farm");
+
+        fetch('/Visitor/RemoveFromWishlistSK', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ farmhousecode: farmhousecode })
+
+        }).then(() => {
+
+            let card = btn.closest(".col-lg-3");
+
+            card.remove();
+
+            // check remaining wishlist cards
+            let remaining = document.querySelectorAll("#wishlistContainer .col-lg-3");
+
+            if (remaining.length === 0) {
+
+                document.getElementById("wishlistContainer").style.display = "none";
+
+                document.getElementById("emptyWishlist").style.display = "flex";
+
+            }
+
+        });
+
+        showToast("Removed from wishlist", "error");
+    }
+
+    @*sweetalerts&toasters*@
+
+    //function showLoading() {
+
+    //    Swal.fire({
+    //        title: "Loading...",
+    //        text: "Please wait",
+    //        allowOutsideClick: false,
+    //        didOpen: () => {
+    //            Swal.showLoading()
+    //        }
+    //    });
+
+    //    setTimeout(() => {
+    //        Swal.close()
+    //    }, 2000);
+
+    //}
+    function showLoading(title, message) {
+
+        Swal.fire({
+
+            title: title,
+
+            html: `
+
+<div class="modern-loader">
+
+<div class="loader-ring"></div>
+
+<div class="loader-title">
+${title}
+</div>
+
+<div class="loader-text">
+${message}
+<span class="dots"></span>
+</div>
+
+</div>
+`,
+
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            background: "#ffffff",
+            width: 400
+
+        });
+
+    }
+    function showToast(message, type = "info") {
+
+        let container = document.getElementById("toastContainer");
+
+        let toast = document.createElement("div");
+
+        toast.className = "custom-toast toast-" + type;
+
+        let icon = "fa-circle-info";
+
+        if (type === "success") icon = "fa-check";
+        if (type === "error") icon = "fa-xmark";
+        if (type === "warning") icon = "fa-exclamation";
+
+        toast.innerHTML = `
+
+<div class="toast-icon">
+
+<i class="fa-solid ${icon}"></i>
+
+</div>
+
+<div>
+
+${message}
+
+</div>
+
+<div class="toast-close">
+
+<i class="fa-solid fa-xmark"></i>
+
+</div>
+
+<div class="toast-progress"></div>
+
+`;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+
+            toast.style.opacity = "0";
+
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+
+        }, 3000);
+
+        toast.querySelector(".toast-close").onclick = function () {
+
+            toast.remove();
+
+        }
+
+    }
+    function openFarm(url) {
+
+        showLoading(
+            "Loading farm",
+            "Opening farm details..."
+        );
+
+        // minimum 1 second loader
+        setTimeout(function () {
+
+            window.location.href = url;
+
+        }, 1000);
+
+    }
+</script>
+

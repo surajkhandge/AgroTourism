@@ -1,0 +1,714 @@
+﻿@model AgroClassLib.Visitor.GuestPageVH
+
+@{
+    ViewBag.Title = "Guest Details";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+<div class="container guestdetailbox mt-5 mb-5">
+
+    <div class="row g-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0 p-4">
+
+                <h4 class="fw-bold mb-2">
+
+                    Guest Details
+
+                </h4>
+
+                <p class="text-muted mb-4">
+
+                    Please provide details for each guest
+
+                </p>
+
+
+                <!-- Stay Details -->
+
+                <div class="staycard border-0 bg-light p-3 mb-4">
+
+                    <div class="row text-center">
+
+                        <div class="col-md-4">
+
+                            <div class="text-muted small">
+                                Check-in
+                            </div>
+
+                            <div class="fw-bold">
+                                @Model.CheckIn
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="text-muted small">
+                                Check-out
+                            </div>
+
+                            <div class="fw-bold">
+                                @Model.CheckOut
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="text-muted small">
+                                Total Nights
+                            </div>
+
+                            <div class="fw-bold">
+                                @Model.Nights
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @using (Html.BeginForm("GuestDetailsVH", "Visitor",
+FormMethod.Post,
+new { id = "guestForm", novalidate = "novalidate" }))
+
+                {
+
+                    <div id="guestContainer">
+
+                        @for (int i = 0; i < Model.Guests.Count; i++)
+                        {
+
+                            <div class="guestcard mb-3 guest-card p-3">
+
+                                <div class="guest-title">
+
+                                    Guest @(i+1) Details
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+
+                                        <label>Full Name</label>
+
+                                        @Html.TextBoxFor(
+                                        m => m.Guests[i].FullName,
+                                        new
+                                        {
+                                            @class = "form-control name",
+
+                                        placeholder = "Enter full name"
+                                        })
+
+                                        <div class="error-msg"></div>
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label>Age</label>
+
+                                        @Html.TextBoxFor(
+                                        m => m.Guests[i].Age,
+                                        new
+                                        {
+                                            @class = "form-control age",
+
+                                        type = "number"
+                                        })
+
+                                        <div class="error-msg"></div>
+
+                                    </div>
+
+
+                                    <div class="col-md-6 mt-3">
+
+                                        <label>Contact Number</label>
+
+                                        @Html.TextBoxFor(
+                                        m => m.Guests[i].ContactNumber,
+                                        new
+                                        {
+                                            @class = "form-control mobile",
+
+                                            maxlength = "10"
+                                        })
+
+                                        <div class="error-msg"></div>
+
+                                    </div>
+
+
+                                    <div class="col-md-6 mt-3">
+
+                                        <label>Email</label>
+
+                                        @Html.TextBoxFor(
+                                        m => m.Guests[i].Email,
+                                        new
+                                        {
+                                        @class = "form-control email"
+
+                                        })
+
+                                        <div class="error-msg"></div>
+
+                                    </div>
+
+
+                                    <div class="col-md-12 mt-3">
+
+                                        <label class="me-3">
+
+                                            Gender
+
+                                        </label>
+
+                                        @Html.RadioButtonFor(
+                                        m => m.Guests[i].Gender,
+                                        "Male")
+
+                                        Male
+
+                                        @Html.RadioButtonFor(
+                                        m => m.Guests[i].Gender,
+                                        "Female")
+
+                                        Female
+
+                                        @Html.RadioButtonFor(
+                                        m => m.Guests[i].Gender,
+                                        "Others")
+
+                                        Others
+
+                                        <div class="gender-error"></div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <button type="button"
+                                id="addGuestBtn"
+                                class="btn btn-outline-success">
+
+                            + Add Guest
+
+                        </button>
+
+
+                        <button type="submit"
+                                class="btn btn-success px-4">
+
+                            Confirm Booking
+
+                        </button>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow border-0 p-4 booking-summary">
+
+                <h5 class="fw-bold mb-3">
+
+                    Booking Summary
+
+                </h5>
+
+                @if (Model.IsPackageBooking)
+                {
+
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span class="text-muted">
+
+                            Package
+
+                        </span>
+
+                        <span>
+
+                            @Model.PackageName
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span class="text-muted">
+
+                            Stay
+
+                        </span>
+
+                        <span>
+
+                            @Model.Nights Nights
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+
+                            Package Price
+
+                        </span>
+
+                        <span>
+
+                            ₹@Model.PackagePrice
+
+                        </span>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold">
+
+                        <span>
+
+                            Total Amount
+
+                        </span>
+
+                        <span class="text-success fs-5">
+
+                            ₹@Model.PackagePrice
+
+                        </span>
+
+                    </div>
+
+                }
+                else
+                {
+
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span class="text-muted">
+
+                            Room Charges
+
+                        </span>
+
+                        <span>
+
+                            ₹@Model.RoomTotal
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span class="text-muted">
+
+                            Activity Charges
+
+                        </span>
+
+                        <span>
+
+                            ₹@Model.ActivityTotal
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+
+                            Food Charges
+
+                        </span>
+
+                        <span>
+
+                            ₹@Model.FoodTotal
+
+                        </span>
+
+                    </div>
+
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold">
+
+                        <span>
+
+                            Total Amount
+
+                        </span>
+
+                        <span class="text-success fs-5">
+
+                            ₹@Model.TotalPrice
+
+                        </span>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .guestdetailbox {
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .guest-card {
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        transition: .2s;
+    }
+
+        .guest-card:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        }
+
+    .staycard {
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        transition: .2s;
+    }
+
+        .staycard:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        }
+
+    .guest-title {
+        background: #2d6a4f;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .booking-summary {
+        position: sticky;
+        top: 100px;
+        border-radius: 12px;
+    }
+
+    .error-msg {
+        color: red;
+        font-size: 13px;
+    }
+
+    .gender-error {
+        color: red;
+        font-size: 13px;
+    }
+
+    .invalid {
+        border: 1px solid red !important;
+        background: #fff5f5;
+    }
+
+    .valid {
+        border: 1px solid #28a745 !important;
+        background: #f8fff9;
+    }
+
+    .card:hover,
+    .container:hover {
+        box-shadow: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+var maxGuests=@Model.TotalGuests;
+
+
+document.getElementById("addGuestBtn")
+.onclick=function(){
+
+let container=
+document.getElementById(
+"guestContainer");
+
+let count=
+container.getElementsByClassName(
+"guest-card").length;
+
+if(count>=maxGuests){
+
+Swal.fire(
+"Guest limit reached");
+
+return;
+
+}
+
+    let html = `
+
+<div class="guestcard mb-3 guest-card p-3">
+
+<div class="guest-title">
+Guest ${count + 1} Details
+</div>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label>Full Name</label>
+
+<input name="Guests[${count}].FullName"
+class="form-control name"
+required/>
+
+<div class="error-msg"></div>
+
+</div>
+
+<div class="col-md-6">
+
+<label>Age</label>
+
+<input name="Guests[${count}].Age"
+type="number"
+class="form-control age"
+required/>
+
+<div class="error-msg"></div>
+
+</div>
+
+<div class="col-md-6 mt-3">
+
+<label>Contact</label>
+
+<input name="Guests[${count}].ContactNumber"
+class="form-control mobile"
+maxlength="10"
+required/>
+
+<div class="error-msg"></div>
+
+</div>
+
+<div class="col-md-6 mt-3">
+
+<label>Email</label>
+
+<input name="Guests[${count}].Email"
+class="form-control email"
+required/>
+
+<div class="error-msg"></div>
+
+</div>
+
+<div class="col-md-12 mt-3">
+
+<label>Gender</label>
+
+<input type="radio"
+name="Guests[${count}].Gender"
+value="Male"> Male
+
+<input type="radio"
+name="Guests[${count}].Gender"
+value="Female"> Female
+
+<input type="radio"
+name="Guests[${count}].Gender"
+value="Others"> Others
+
+<div class="gender-error"></div>
+
+</div>
+
+</div>
+
+</div>`;
+
+container.insertAdjacentHTML(
+"beforeend",html);
+
+}
+
+</script>
+<script>
+
+    document.getElementById("guestForm").addEventListener("submit", function (e) {
+
+        var isValid = true;
+
+        var guests = document.querySelectorAll(".guest-card");
+
+        guests.forEach(function (guest) {
+
+            // NAME VALIDATION
+            var name = guest.querySelector("input[name*='FullName']");
+            var nameError = name.nextElementSibling;
+
+            if (!/^[A-Za-z\s]+$/.test(name.value.trim())) {
+                name.classList.add("invalid");
+                name.classList.remove("valid");
+                nameError.innerText = "Name must contain letters only";
+                isValid = false;
+            }
+            else {
+                name.classList.remove("invalid");
+                name.classList.add("valid");
+                nameError.innerText = "";
+            }
+
+            // AGE VALIDATION
+            var age = guest.querySelector("input[name*='Age']");
+            var ageError = age.nextElementSibling;
+
+            var ageValue = parseInt(age.value);
+
+            if (isNaN(ageValue) || ageValue < 10 || ageValue > 100) {
+                age.classList.add("invalid");
+                age.classList.remove("valid");
+                ageError.innerText = "Age must be between 10 and 100";
+                isValid = false;
+            }
+            else {
+                age.classList.remove("invalid");
+                age.classList.add("valid");
+                ageError.innerText = "";
+            }
+
+            // MOBILE VALIDATION
+            var mobile = guest.querySelector("input[name*='ContactNumber']");
+            var mobileError = mobile.nextElementSibling;
+
+            if (!/^[0-9]{10}$/.test(mobile.value)) {
+                mobile.classList.add("invalid");
+                mobile.classList.remove("valid");
+                mobileError.innerText = "Enter a valid 10 digit mobile number";
+                isValid = false;
+            }
+            else {
+                mobile.classList.remove("invalid");
+                mobile.classList.add("valid");
+                mobileError.innerText = "";
+            }
+
+            // EMAIL VALIDATION
+            var email = guest.querySelector("input[name*='Email']");
+            var emailError = email.nextElementSibling;
+
+            var emailPattern = /^[^\s@@]+@@[^\s@@]+\.(com|in|net|org)$/;
+
+            if (!emailPattern.test(email.value.trim())) {
+                email.classList.add("invalid");
+                email.classList.remove("valid");
+                emailError.innerText = "Enter a valid email address";
+                isValid = false;
+            }
+            else {
+                email.classList.remove("invalid");
+                email.classList.add("valid");
+                emailError.innerText = "";
+            }
+
+            // GENDER VALIDATION
+            var gender = guest.querySelector("input[name*='Gender']:checked");
+            var genderError = guest.querySelector(".gender-error");
+
+            if (!gender) {
+                genderError.innerText = "Please select gender";
+                isValid = false;
+            }
+            else {
+                genderError.innerText = "";
+            }
+
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+
+    });
+
+
+    // CONTACT NUMBER → ONLY NUMBERS
+    document.addEventListener("input", function (e) {
+
+        if (e.target.name && e.target.name.includes("ContactNumber")) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        }
+
+    });
+
+    if (count + 1 >= maxGuests) {
+        document.getElementById("addGuestBtn").disabled = true;
+    }
+
+</script>

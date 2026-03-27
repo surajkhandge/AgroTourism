@@ -1,0 +1,252 @@
+﻿@model AgroClassLib.Visitor.RegistrationVH
+
+@{
+    ViewBag.Title = "Visitor Profile";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@{
+    bool isEdit = ViewBag.IsEdit ?? false;
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+
+    <script>
+
+Swal.fire({
+
+icon:'success',
+title:'Success',
+text:'@TempData["SuccessMessage"]'
+
+});
+
+    </script>
+
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+
+    <script>
+
+Swal.fire({
+
+icon:'error',
+title:'Error',
+text:'@TempData["ErrorMessage"]'
+
+});
+
+    </script>
+
+}
+
+@using (Html.BeginForm("VisitorProfileAA", "Visitor", FormMethod.Post,
+new { novalidate = "novalidate" }))
+{
+
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(m => m.VisitorCode)
+    @Html.HiddenFor(m => m.FullName)
+    @Html.HiddenFor(m => m.EmailAddress)
+    @Html.HiddenFor(m => m.Gender)
+    @Html.HiddenFor(m => m.AdharCardNo)
+    @Html.HiddenFor(m => m.StateName)
+    @Html.HiddenFor(m => m.CityName)
+    @Html.HiddenFor(m => m.Address)
+    @Html.HiddenFor(m => m.Pincode)
+
+    <style>
+
+        .Profile {
+            min-height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ProfileContainer {
+            width: 500px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+
+    <div class="Profile">
+
+        <div class="ProfileContainer">
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Visitor Name
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.FullName)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Email Address
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.EmailAddress)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Mobile Number
+                </div>
+
+                <div class="col-md-6">
+
+                    @if (isEdit)
+                    {
+
+                        @Html.TextBoxFor(m => m.MobileNumber,
+                        new
+                        {
+                            @class = "form-control",
+                        maxlength = "10"
+                        })
+
+                    }
+                    else
+                    {
+
+                        @Html.DisplayFor(m => m.MobileNumber)
+                        @Html.HiddenFor(m => m.MobileNumber)
+
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Gender
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.Gender)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Aadhar Number
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.AdharCardNo)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    State
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.StateName)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    City
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.CityName)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Address
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.Address)
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6 fw-bold">
+                    Pincode
+                </div>
+
+                <div class="col-md-6">
+                    @Html.DisplayFor(m => m.Pincode)
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                @if (isEdit)
+                {
+
+                    <button type="submit"
+                            class="btn btn-outline-success me-2">
+
+                        Save
+
+                    </button>
+
+                    <a href="@Url.Action("VisitorProfileAA")"
+                       class="btn btn-outline-danger">
+
+                        Cancel
+
+                    </a>
+
+                }
+                else
+                {
+
+                    <a href="@Url.Action("VisitorProfileAA",
+new { isEdit=true })"
+                       class="btn btn-outline-primary">
+                        <i class="fa fa-pencil"></i>
+                        Update
+
+                    </a>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+}

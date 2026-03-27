@@ -1,0 +1,168 @@
+﻿@model AgroClassLib.Visitor.ConfirmBookingVH
+
+@{
+    ViewBag.Title = "Confirm Booking";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg p-4">
+
+        <h3 class="mb-3">Confirm Your Booking</h3>
+        <p class="text-muted">Please review your booking details before confirming.</p>
+
+        <hr />
+
+        <!-- Farmhouse Details -->
+        <h5 class="mb-3">Farmhouse Details</h5>
+
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <b>Farmhouse :</b> @Model.FarmHouseName
+            </div>
+
+            <div class="col-md-6 text-md-end">
+                <b>Location :</b> @Model.Location
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- Visit Dates -->
+        <h5 class="mb-3">Visit Dates</h5>
+
+        <div class="row text-center">
+
+            <div class="col-md-4">
+                <p class="mb-1 text-muted">Check-in Date</p>
+                <b>@Model.CheckIn.ToString("dd MMM yyyy")</b>
+            </div>
+
+            <div class="col-md-4">
+                <p class="mb-1 text-muted">Check-out Date</p>
+                <b>@Model.CheckOut.ToString("dd MMM yyyy")</b>
+            </div>
+
+            <div class="col-md-4">
+                <p class="mb-1 text-muted">Total Nights</p>
+                <b>@Model.Nights</b>
+            </div>
+
+        </div>
+
+        <hr />
+
+        <!-- Rooms -->
+        <h5 class="mb-3">Rooms Selected</h5>
+
+        <table class="table table-bordered">
+
+            <thead class="table-light">
+                <tr>
+                    <th>Room Type</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-end">Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.Rooms != null)
+                {
+                    foreach (var room in Model.Rooms)
+                    {
+                        <tr>
+                            <td>@room.RoomTypeName</td>
+
+                            <td class="text-center">
+                                @room.Quantity
+                            </td>
+
+                            <td class="text-end">
+                                Rs @(room.PricePerNight * room.Quantity)
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+        <hr />
+
+        <!-- Activities -->
+        <h5 class="mb-3">Activities</h5>
+
+        <table class="table table-bordered">
+
+            <thead class="table-light">
+                <tr>
+                    <th>Activity</th>
+                    <th class="text-end">Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.Activities != null)
+                {
+                    foreach (var act in Model.Activities)
+                    {
+                        <tr>
+
+                            <td>
+                                @act.ActivityServiceName
+                            </td>
+
+                            <td class="text-end">
+                                Rs @act.Price
+                            </td>
+
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+        <hr />
+
+        <!-- Total -->
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <h4>Total Cost</h4>
+            </div>
+
+            <div class="col-md-4 text-end">
+                <h4 class="text-success">Rs @Model.TotalCost</h4>
+            </div>
+
+        </div>
+
+        <br />
+
+        <!-- Buttons -->
+        <div class="text-end">
+
+            <a href="@Url.Action("FarmDetailsSK","Visitor",
+new { id = Model.FarmHouseCode })"
+               class="btn btn-outline-danger btn-rounded">
+
+                <i class="fa fa-times"></i>
+                Cancel
+
+            </a>
+
+            <button class="btn btn-success">
+                Confirm Booking
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

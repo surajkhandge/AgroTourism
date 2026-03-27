@@ -1,0 +1,1254 @@
+﻿
+@model AgroClassLib.Visitor.VisitorSK
+
+@{
+    ViewBag.Title = Model.FarmHouseName;
+    Layout = "~/Views/Shared/Visitor.cshtml";
+    Session["FarmHouseCode"] = Model.FarmHouseCode;
+}
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body {
+        background-color: #fafafa;
+    }
+
+    .farm-title-section {
+        margin-bottom: 25px;
+    }
+
+    .farm-title {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+    }
+
+    .farm-location {
+        color: #2d6a4f;
+        font-weight: 500;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Image Gallery Grid */
+    .gallery-container {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 40px;
+        height: 480px;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+        height: 100%;
+    }
+
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-item:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+        }
+
+    .gallery-main {
+        grid-row: 1 / -1;
+        grid-column: 1 / 2;
+    }
+
+    .view-all-photos-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        color: #1a1a1a;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.2s;
+        z-index: 10;
+    }
+
+        .view-all-photos-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+    /* General Section Styling */
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 20px;
+    }
+
+    .section-divider {
+        border-top: 1px solid #e0e0e0;
+        margin: 40px 0;
+    }
+
+    .about-text {
+        color: #444;
+        line-height: 1.7;
+        font-size: 1.05rem;
+    }
+
+    /* Amenities */
+    .amenity-card {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: #fff;
+        border: 1px solid #eaebec;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        transition: 0.3s;
+    }
+
+        .amenity-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            border-color: #2d6a4f;
+        }
+
+    .amenity-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        object-fit: contain;
+    }
+
+    .amenity-name {
+        font-weight: 500;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    /* Activities Slider */
+    .activities-scroll {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+        padding: 10px 5px 20px 5px;
+        scroll-behavior: smooth;
+    }
+
+        .activities-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .activities-scroll::-webkit-scrollbar-thumb {
+            background: #c3d5cb;
+            border-radius: 10px;
+        }
+
+        .activities-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+    .activity-card {
+        min-width: 240px;
+        background: #fff;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+    .activity-img {
+        height: 160px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .activity-title {
+        padding: 15px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #222;
+    }
+
+    /* Sticky Booking Card */
+    .booking-widget {
+        position: sticky;
+        top: 100px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        border: 1px solid #eee;
+        margin-bottom: 40px;
+        z-index: 5;
+    }
+
+    .price-display {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+    }
+
+        .price-display small {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+    .date-picker-group {
+        border: 1px solid #b0b0b0;
+        border-radius: 10px;
+        display: flex;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .date-input-wrapper {
+        flex: 1;
+        padding: 10px 15px;
+        position: relative;
+    }
+
+        .date-input-wrapper:first-child {
+            border-right: 1px solid #b0b0b0;
+        }
+
+    .date-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #222;
+        margin-bottom: 2px;
+    }
+
+    .date-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 0;
+        color: #666;
+        font-size: 0.9rem;
+        background: transparent;
+    }
+
+    /* Buttons */
+    .btn-check-avail {
+        background-color: #2d6a4f;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.3s;
+    }
+
+        .btn-check-avail:hover {
+            background-color: #1b4332;
+            color: white;
+        }
+
+    .btn-outline-custom {
+        border: 1px solid #222;
+        color: #222;
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        background: transparent;
+    }
+
+        .btn-outline-custom:hover {
+            background: #f8f9fa;
+        }
+
+    /* ===== PACKAGE SECTION CLEAN CSS ===== */
+
+    .package-slider-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .package-slider {
+        display: flex;
+        gap: 22px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 10px 5px;
+    }
+
+    .package-slide {
+        min-width: 320px;
+        flex: 0 0 320px;
+    }
+
+    .package-card {
+        background: white;
+        border: 1px solid #e6e6e6;
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: .25s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+        .package-card:hover {
+            border: 1px solid #2d6a4f;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+
+    /* selected look (light green like your image) */
+
+    .package-selected {
+        background: #edf6f1;
+        border: 1.5px solid #2d6a4f;
+    }
+
+        .package-selected::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #2d6a4f;
+        }
+
+    /* image */
+
+    .package-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    /* body */
+
+    .package-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* top section */
+
+    .package-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .package-title {
+        font-weight: 700;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .package-days {
+        font-size: 13px;
+        color: #666;
+    }
+
+    /* price */
+
+    .price-box {
+        text-align: right;
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        font-size: 13px;
+        color: #888;
+    }
+
+    .discount-price {
+        font-size: 20px;
+        font-weight: 800;
+        color: #2d6a4f;
+    }
+
+    .discount-badge {
+        background: #e9f7ef;
+        color: #2d6a4f;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        display: inline-block;
+        margin-top: 3px;
+    }
+
+    /* features */
+
+    .package-features-modern {
+        margin: 12px 0;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+    }
+
+        .package-features-modern li {
+            margin: 6px 0;
+            color: #444;
+        }
+
+        .package-features-modern i {
+            color: #2d6a4f;
+            margin-right: 6px;
+        }
+
+    /* button */
+
+    .package-select-btn {
+        background: #2d6a4f;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+        .package-select-btn:hover {
+            background: #1b4332;
+        }
+
+    /* slider arrows */
+
+    .slider-btn {
+        position: absolute;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: none;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 5;
+    }
+
+        .slider-btn.left {
+            left: -18px;
+        }
+
+        .slider-btn.right {
+            right: -18px;
+        }
+
+        .slider-btn:hover {
+            background: #2d6a4f;
+            color: white;
+        }
+
+    /* Custom Modal Styling */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eee;
+        padding: 20px 24px;
+    }
+
+    .modal-title {
+        font-weight: 600;
+    }
+
+    .custom-gallery-scroll {
+        max-height: 80vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Alert Status */
+    .status-alert {
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @@media(max-width: 991px) {
+        .gallery-container {
+            height: 350px;
+        }
+
+        .booking-widget {
+            position: static;
+            margin-top: 30px;
+        }
+    }
+
+    @@media(max-width: 768px) {
+        .gallery-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        .gallery-item:not(.gallery-main) {
+            display: none;
+        }
+
+        .gallery-container {
+            border-radius: 0;
+            margin: 0 -15px 30px -15px;
+            height: 250px;
+        }
+
+        .view-all-photos-btn {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .amenity-card {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .amenity-icon {
+            height: 20px;
+            width: 20px;
+        }
+    }
+</style>
+
+<div id="toastContainer" class="toast-container"></div>
+<div class="container mt-4 pt-3 mb-5">
+
+    <!-- HEADER SECTION -->
+    <div class="farm-title-section">
+        <h1 class="farm-title">@Model.FarmHouseName</h1>
+        <div class="farm-location">
+            <i class="fa-solid fa-location-dot"></i> @Model.FarmAddress
+        </div>
+    </div>
+
+    <div class="row mb-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+
+            <!-- IMAGE CAROUSEL -->
+            <div id="farmCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+
+                <div class="carousel-inner rounded shadow-sm">
+
+                    @{
+                        int i = 0;
+                    }
+
+                    @foreach (var img in Model.Images)
+                    {
+                        <div class="carousel-item @(i==0?"active":"")">
+
+                            <img src="@Url.Content(img)"
+                                 class="d-block w-100"
+                                 style="height:350px;object-fit:cover;">
+
+                        </div>
+
+                        i++;
+                    }
+
+                </div>
+
+                <button class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#farmCarousel"
+                        data-bs-slide="prev">
+
+                    <span class="carousel-control-prev-icon"></span>
+
+                </button>
+
+                <button class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#farmCarousel"
+                        data-bs-slide="next">
+
+                    <span class="carousel-control-next-icon"></span>
+
+                </button>
+
+            </div>
+
+            <button class="btn btn-outline-dark btn-sm mb-4"
+                    onclick="showAllImages()">
+
+                View All Photos
+
+            </button>
+
+
+            <!-- ABOUT -->
+            <h3 class="section-title">About this place</h3>
+
+            <p class="about-text mb-4">
+
+                @Model.FarmDetails
+
+            </p>
+
+
+            <div class="section-divider"></div>
+
+
+            <!-- AMENITIES -->
+            <h3 class="section-title">
+
+                What this place offers
+
+            </h3>
+
+            <div class="row g-3 mb-4">
+
+                @foreach (var item in Model.Amenities)
+                {
+
+                    <div class="col-md-4">
+
+                        <div class="amenity-card">
+
+                            <img src="@Url.Content("~/Uploads/Common/Amenities/" + item.ImagePath)"
+                                 class="amenity-icon">
+
+                            <span class="amenity-name">
+
+                                @item.Name
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+
+            <div class="section-divider"></div>
+
+
+            <!-- ACTIVITIES -->
+            <h3 class="section-title">
+
+                Activities
+
+            </h3>
+
+            <div class="row">
+
+                @foreach (var act in Model.Activities.Take(4))
+                {
+
+                    <div class="col-md-3 mb-3">
+
+                        <div class="card shadow-sm border-0">
+
+                            <img src="@Url.Content("~/Uploads/Common/Activities/" + act.ImagePath)"
+                                 style="height:140px;object-fit:cover;">
+
+                            <div class="p-2 text-center">
+
+                                <b>@act.Name</b>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+            <button class="btn btn-outline-dark btn-sm mt-2"
+                    onclick="showAllActivities()">
+
+                View All Activities
+
+            </button>
+            <div class="section-divider"></div>
+
+            @if (Model.Packages != null && Model.Packages.Count > 0)
+            {
+
+                <h3 class="section-title">
+                    Farm Packages
+                </h3>
+
+                <div class="package-slider-wrapper">
+
+                    <button class="slider-btn left"
+                            onclick="slidePackages(-1)">
+
+                        <i class="fa fa-chevron-left"></i>
+
+                    </button>
+
+                    <div class="package-slider" id="packageSlider">
+
+                        @foreach (var pkg in Model.Packages)
+                        {
+
+                            <div class="package-slide">
+
+                                <div class="package-card"
+                                     data-name="@pkg.PackageName"
+                                     data-price="@pkg.TotalPrice"
+                                     data-days="@pkg.NoOfDays"
+                                     data-nights="@pkg.NoOfNight"
+                                     onclick="selectPackage(this)">
+
+
+                                    <img src="@Url.Content("~/Uploads/Common/Packages/" + pkg.ImagePath)"
+                                         class="package-img"
+                                         onerror="this.src='/Content/images/default-package.jpg'">
+
+
+                                    <div class="package-body">
+
+                                        <div class="package-top">
+
+                                            <div>
+
+                                                <h6 class="package-title">
+
+                                                    @pkg.PackageName
+
+                                                </h6>
+
+                                                <div class="package-days">
+
+                                                    @pkg.NoOfDays Days /
+                                                    @pkg.NoOfNight Nights
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="price-box">
+
+                                                <div class="original-price">
+
+                                                    ₹@pkg.PackagePrice
+
+                                                </div>
+
+                                                <div class="discount-price">
+
+                                                    ₹@pkg.TotalPrice
+
+                                                </div>
+
+                                                <div class="discount-badge">
+
+                                                    @pkg.DiscountPercent% OFF
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <ul class="package-features-modern">
+
+                                            <li>
+
+                                                <i class="fa fa-bed"></i>
+
+                                                @pkg.RoomTypeName
+
+                                            </li>
+
+                                            <li>
+
+                                                <i class="fa fa-utensils"></i>
+
+                                                @pkg.MealTypeName
+
+                                            </li>
+
+                                            <li>
+
+                                                <i class="fa fa-tree"></i>
+
+                                                Farm Activities
+
+                                            </li>
+
+                                        </ul>
+
+                                        <button class="package-select-btn">
+
+                                            Select Package
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                    <button class="slider-btn right"
+                            onclick="slidePackages(1)">
+
+                        <i class="fa fa-chevron-right"></i>
+
+                    </button>
+
+                </div>
+
+            }
+            <div class="section-divider"></div>
+
+            <div id="reviewsSection">
+
+                @Html.Partial("GuestReviewsSKK", Model.FarmReviews)
+
+            </div>
+        </div>
+
+
+        <!-- RIGHT : BOOKING CARD -->
+        <!-- RIGHT COLUMN (30%) - BOOKING WIDGET -->
+        <div class="col-lg-4">
+            <div class="booking-widget">
+                <div class="price-display">
+                    ₹@Model.BasePrice <small>/ night</small>
+                </div>
+
+                <!-- Date Picker Group -->
+                <div class="date-picker-group">
+                    <div class="date-input-wrapper">
+                        <label class="date-label">Check-In</label>
+                        <input type="text" id="checkinDate" class="date-input" placeholder="Select date" readonly />
+                        <input type="hidden" id="hdCheckIn" />
+                    </div>
+                    <div class="date-input-wrapper">
+                        <label class="date-label">Check-Out</label>
+                        <input type="text" id="checkoutDate" class="date-input" placeholder="Select date" readonly />
+                        <input type="hidden" id="hdCheckOut" />
+                    </div>
+                </div>
+
+                <button class="btn-check-avail mb-3" onclick="checkAvailability()">
+                    Check Availability
+                </button>
+
+
+
+                <div id="availabilityResult" class="mb-3"></div>
+
+                <div class="mt-4 pt-2 border-top">
+
+                    <!-- Custom Package Button -->
+                    <a href="@Url.Action("SelectRoomsVH","Visitor",
+new { farmCode = Model.FarmHouseCode })"
+                       class="btn btn-outline-custom mb-3 text-center d-block text-decoration-none">
+
+                        Create Custom Package
+
+                    </a>
+
+                    <!-- Main Book button -->
+                    <button onclick="goToBooking()" class="btn-check-avail w-100 btn-success">
+                        Book Now
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= MODALS ================= -->
+<!-- Image Gallery Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Photo Tour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body custom-gallery-scroll p-4">
+                <div class="row g-3">
+                    @if (Model.Images != null)
+                    {
+                        foreach (var img in Model.Images)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <img src="@Url.Content(img)" class="img-fluid rounded w-100" style="height: 250px; object-fit: cover; box-shadow: 0 2px 10px rgba(0,0,0,0.08);" />
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activities Modal -->
+<div class="modal fade" id="activityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">All Farm Activities</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    @if (Model.Activities != null)
+                    {
+                        foreach (var act in Model.Activities)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                                    <img src="@Url.Content("~/Uploads/Common/Activities/" + act.ImagePath)" class="card-img-top" style="height: 180px; object-fit: cover;" onerror="this.src='/Content/images/default-activity.png'" />
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-0">@act.Name</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+
+<script>
+
+/* ===== GLOBAL ===== */
+
+let selectedPackageName="";
+let selectedPrice="";
+let selectedDays="";
+let selectedNights="";
+
+/* ===== DATE SETUP ===== */
+
+$(document).ready(function(){
+
+let today=new Date();
+
+$('#checkinDate').datepicker({
+
+autoHide:true,
+format:'dd-mm-yyyy',
+startDate:today
+
+}).on('change',function(){
+
+let val=$(this).val();
+
+$("#hdCheckIn").val(val);
+
+let checkIn=$(this).datepicker('getDate');
+
+let next=new Date(checkIn);
+
+next.setDate(next.getDate()+1);
+
+$('#checkoutDate').datepicker('setStartDate',next);
+
+$('#checkoutDate').val("");
+
+$("#hdCheckOut").val("");
+
+$("#availabilityResult").html("");
+
+validatePackages();
+
+});
+
+$('#checkoutDate').datepicker({
+
+autoHide:true,
+format:'dd-mm-yyyy',
+startDate:today
+
+}).on('change',function(){
+
+$("#hdCheckOut").val($(this).val());
+
+$("#availabilityResult").html("");
+
+validatePackages();
+
+});
+
+});
+
+/* ===== DATE FORMAT ===== */
+
+function convertToISO(date){
+
+if(!date) return null;
+
+let p=date.split("-");
+
+return p[2]+"-"+p[1]+"-"+p[0];
+
+}
+
+/* ===== AVAILABILITY ===== */
+
+function checkAvailability(){
+
+let checkIn=$("#hdCheckIn").val();
+
+let checkOut=$("#hdCheckOut").val();
+
+if(!checkIn || !checkOut){
+
+showToast("Select dates first","warning");
+
+return;
+
+}
+
+$("#availabilityResult").html(
+'<div class="text-secondary">Checking...</div>'
+);
+
+fetch('/Visitor/CheckAvailabilitySK?farmCode=@Model.FarmHouseCode&checkIn='
++convertToISO(checkIn)+'&checkOut='
++convertToISO(checkOut))
+
+.then(r=>r.json())
+
+.then(data=>{
+
+if(data.status==="Available")
+
+$("#availabilityResult").html(
+'<div class="status-alert bg-success text-white">Dates available</div>'
+);
+
+else
+
+$("#availabilityResult").html(
+'<div class="status-alert bg-danger text-white">Not available</div>'
+);
+
+});
+
+}
+
+/* ===== PACKAGE SELECT ===== */
+
+function selectPackage(card){
+
+let checkIn=$("#hdCheckIn").val();
+
+let checkOut=$("#hdCheckOut").val();
+
+if(!checkIn || !checkOut){
+
+showToast("Select dates first","warning");
+
+return;
+
+}
+
+$(".package-card").removeClass("package-selected");
+
+$(card).addClass("package-selected");
+
+selectedPackageName=$(card).data("name");
+
+selectedPrice=$(card).data("price");
+
+selectedDays=$(card).data("days");
+
+selectedNights=$(card).data("nights");
+
+showToast("Package Selected","success");
+
+}
+
+/* ===== PACKAGE VALIDATION ===== */
+
+function validatePackages(){
+
+let checkIn=$("#hdCheckIn").val();
+
+let checkOut=$("#hdCheckOut").val();
+
+if(!checkIn || !checkOut) return;
+
+let start=new Date(convertToISO(checkIn));
+
+let end=new Date(convertToISO(checkOut));
+
+let nights=Math.ceil((end-start)/(1000*60*60*24));
+
+$(".package-card").each(function(){
+
+let pkgNights=parseInt($(this).data("nights"));
+
+if(pkgNights<=nights){
+
+$(this).css("opacity","1");
+
+$(this).css("pointer-events","auto");
+
+}
+
+else{
+
+$(this).css("opacity","0.4");
+
+$(this).css("pointer-events","none");
+
+}
+
+});
+
+}
+
+/* ===== BOOKING ===== */
+
+function goToBooking(){
+
+let checkIn=$("#hdCheckIn").val();
+let checkOut=$("#hdCheckOut").val();
+    if(!checkIn || !checkOut){showToast("Select dates","warning");return;}
+    if (selectedPackageName == "") {showToast("Select package", "warning");return;}
+
+let start=new Date(convertToISO(checkIn));
+let nights=parseInt(selectedNights);
+let newOut=new Date(start);
+newOut.setDate(newOut.getDate()+nights);
+let finalOut=newOut.toISOString().split('T')[0];
+$.post('/Visitor/SetBookingSessionSK',{
+farmCode:'@Model.FarmHouseCode',
+packageName:selectedPackageName,
+price:selectedPrice,
+days:selectedDays,
+nights:selectedNights,
+checkIn:convertToISO(checkIn),
+    checkOut: finalOut
+},
+
+function(){
+window.location.href='/Visitor/GuestDetailsVH';});
+}
+
+/* ===== SLIDER ===== */
+function slidePackages(dir){
+document.getElementById("packageSlider").scrollLeft += dir*300;
+}
+/* ===== MODALS ===== */
+function showAllImages(){
+new bootstrap.Modal(
+document.getElementById('imageModal')).show();
+}
+
+function showAllActivities(){
+new bootstrap.Modal(
+    document.getElementById('activityModal')).show();
+}
+    function showToast(message, type = "info") {
+        let container = document.getElementById("toastContainer");
+        let toast = document.createElement("div");
+        toast.className = "custom-toast toast-" + type;
+        let icon = "fa-circle-info";
+        if (type === "success") icon = "fa-check";
+        if (type === "error") icon = "fa-xmark";
+        if (type === "warning") icon = "fa-exclamation";
+
+        toast.innerHTML = `<div class="toast-icon">
+<i class="fa-solid ${icon}"></i>
+</div>
+<div>
+${message}
+</div>
+<div class="toast-close">
+<i class="fa-solid fa-xmark"></i>
+</div>
+<div class="toast-progress"></div>`;
+
+        container.appendChild(toast);
+        setTimeout(() => {
+
+            toast.style.opacity = "0";
+
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+
+        toast.querySelector(".toast-close").onclick = function () {
+            toast.remove();
+        }
+
+    }
+</script>
