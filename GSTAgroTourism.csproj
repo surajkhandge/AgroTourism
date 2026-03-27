@@ -330,7 +330,7 @@
     <Content Include="Views\Visitor\WishlistSK.cshtml" />
     <Content Include="Views\Visitor\FarmDetailsSK.cshtml" />
     <Content Include="Views\Home\AgroTrip.cshtml" />
-    <None Include="Views\Home\Index.cshtml" />
+    <None Include="Views\FarmOwner\Index.cshtml" />
     <Content Include="Views\Visitor\ConfirmBookingSK.cshtml" />
     <Content Include="Views\Visitor\ConfirmBookingVH.cshtml" />
     <Content Include="Views\Visitor\FoodServicesVH.cshtml" />
@@ -358,7 +358,6 @@
     <Folder Include="uploads\Farmhouses\FH002\Activities\" />
     <Folder Include="uploads\Farmhouses\FH002\Menu\" />
     <Folder Include="uploads\Farmhouses\FH002\Rooms\" />
-    <Folder Include="Views\FarmOwner\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

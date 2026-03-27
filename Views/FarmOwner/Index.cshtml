@@ -1,0 +1,951 @@
+﻿@model AgroClassLib.FarmOwner.LoginRS
+
+@{
+    ViewBag.Title = "Login";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* 🔥 IMPORTANT */
+        /*        display: grid;
+        place-items: center;*/
+    }
+
+        body.swal2-shown {
+            overflow: hidden !important;
+            padding-right: 0 !important;
+        }
+
+    .swal2-container {
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .main-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100vh; /* 🔥 important */
+    }
+
+    html, body {
+        overflow-x: hidden;
+    }
+
+    .left-panel, .right-panel {
+        display: flex;
+        align-items: center;
+    }
+
+    .left-panel {
+        justify-content: flex-end;
+    }
+
+    .right-panel {
+        justify-content: flex-start;
+    }
+
+    .left-card {
+        background: linear-gradient(135deg, #134e5e, #2ecc71);
+        border-radius: 20px;
+        padding: 40px;
+        width: 420px;
+        height: 560px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        margin-right: -10px;
+    }
+
+    .login-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        width: 420px;
+        height: 560px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        display: flex; /* 🔥 ADD */
+        flex-direction: column; /* 🔥 ADD */
+        justify-content: center; /* 🔥 CENTER vertically */
+    }
+
+        .login-card p {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .form-control {
+        background: rgba(255,255,255,0.9);
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        width: 100%;
+        height: 45px;
+        padding: 10px 45px 10px 15px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    /* Password field wrapper */
+    .password-field {
+        position: relative;
+        width: 100%;
+    }
+        /* Password input - space for eye icon */
+        .password-field input {
+            padding-right: 45px !important;
+            width: 100%;
+            height: 45px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 5px;
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+
+
+        /* Password input - give space for eye icon */
+        .password-field .form-control {
+            padding-right: 45px !important;
+        }
+
+    /* Eye Icon - INSIDE the input box */
+    /*    .eye-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px;
+        color: #888;
+        z-index: 10;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        pointer-events: auto;
+        padding-right: 69px;
+    }*/
+    .eye-icon {
+        position: absolute;
+        right: 75px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px;
+        color: #555;
+        z-index: 5;
+    }
+
+        .eye-icon:hover {
+            color: #333;
+        }
+
+    /* Hide Edge browser's default eye icon */
+    ::-ms-reveal {
+        display: none;
+    }
+
+    .btn-login {
+        background: linear-gradient(90deg, #134e5e, #27ae60);
+        border-radius: 30px;
+        height: 50px;
+        width: 100%;
+        color: white;
+        border: none;
+        font-weight: 600;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    #forgotForm {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+        #forgotForm input,
+        #forgotForm button {
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #forgotForm input {
+            margin-bottom: 20px;
+        }
+
+    .forgot-btn {
+        color: #888 !important;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    #forgotForm a {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    #forgotForm h3 {
+        margin-bottom: 20px;
+    }
+
+    .create-owner {
+        /*        align-items: center;*/
+        width: 45%;
+        height: 36px;
+        background: #3498db;
+        color: white;
+        /*        padding: 10px 20px;*/
+        border-radius: 5px;
+        margin: 5px;
+        display: flex; /* 🔥 IMPORTANT */
+        align-items: center; /* 🔥 vertical center */
+        justify-content: center; /* 🔥 horizontal center */
+        text-decoration: none;
+    }
+
+    .create-visitor {
+        /*        align-items: center;*/
+        width: 45%;
+        height: 36px;
+        background: #f39c12;
+        color: white;
+        /*        padding: 10px 20px;*/
+        border-radius: 5px;
+        margin: 5px;
+        /*        display: inline-block;*/
+        text-decoration: none;
+        display: flex; /* 🔥 IMPORTANT */
+        align-items: center; /* 🔥 vertical center */
+        justify-content: center; /* 🔥 horizontal center */
+
+        font-size: 14px;
+        /*        border-radius: 20px;*/
+        padding: 0;
+    }
+
+
+
+    /* ===== VALIDATION STATES ===== */
+    input:required:placeholder-shown {
+        border: 2px solid #dc3545 !important;
+    }
+
+    input:required:invalid:not(:placeholder-shown) {
+        border: 2px solid #dc3545 !important;
+    }
+
+    input:required:valid {
+        border: 2px solid #28a745 !important;
+    }
+
+    .form-control:focus {
+        border: 2px solid #28a745 !important;
+        outline: none;
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+    }
+
+    .input-validation-error {
+        border: 2px solid #dc3545 !important;
+    }
+
+    .field-validation-error {
+        position: absolute;
+        bottom: -20px;
+        left: 15px;
+        color: #dc3545;
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+        background: rgba(255,255,255,0.8);
+        padding: 2px 8px;
+        border-radius: 10px;
+        z-index: 5;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        border: none;
+        padding: 10px;
+        border-radius: 25px;
+        cursor: pointer;
+    }
+
+    .btn-success {
+        background: #28a745;
+        border: none;
+        padding: 10px;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+    }
+
+    #otpTimer {
+        font-size: 18px;
+        color: #ff416c;
+        font-weight: bold;
+    }
+
+    #otpForm {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 🔥 vertical center */
+        align-items: center; /* 🔥 horizontal center */
+        height: 100%;
+    }
+
+        #otpForm .form-group {
+            width: 100%;
+            text-align: center;
+        }
+
+    #resendBtn {
+        background: none;
+        border: none;
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+        #resendBtn.active {
+            color: #ff416c;
+            cursor: pointer;
+        }
+
+    .create-account-buttons {
+        display: flex; /* 🔥 IMPORTANT */
+        justify-content: center; /* center align */
+        gap: 10px; /* space between buttons */
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mt-2 {
+        margin-top: 10px;
+    }
+
+    .mt-3 {
+        margin-top: 15px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .mb-3 {
+        margin-bottom: 15px;
+    }
+
+    .mb-4 {
+        margin-bottom: 20px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .swal2-popup {
+        width: 480px !important; /* jast wide */
+        height: 350px !important; /* jast wide */
+        padding: 10px 19px !important; /* height kami */
+        border-radius: 12px;
+    }
+
+    /*    //otp*/
+    .otp-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .otp-box {
+        width: 45px;
+        height: 50px;
+        text-align: center;
+        font-size: 20px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        outline: none;
+        transition: 0.3s;
+    }
+
+        .otp-box:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 5px rgba(40,167,69,0.4);
+        }
+
+        .otp-box:hover {
+            border-color: #28a745;
+        }
+
+    .login-card h2 i {
+        color: #28a745; /* green 🌿 */
+        margin-left: 5px;
+    }
+</style>
+
+
+<div class="main-container">
+
+    <!-- LEFT -->
+    <div class="left-panel">
+        <div class="left-card">
+            <h2>AgroFarm</h2>
+            <p>Smart Farming Solutions</p>
+            <h1>Welcome Back, Farmer!</h1>
+            <p>Manage your farm, track crops, and get insights all in one place.</p>
+        </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-panel">
+        <div class="login-card">
+
+            <div id="loginForm">
+                <h2 class="text-center mb-2">Welcome Back <i class="fa-solid fa-leaf"></i></h2>
+                <p>Sign in to continue to your farm</p>
+
+                @using (Html.BeginForm("LoginRS", "FarmOwner", FormMethod.Post, new { autocomplete = "off" }))
+                {
+                    <!-- EMAIL -->
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="input-wrapper">
+                            @Html.TextBoxFor(m => m.UserEmail, new
+                       {
+                           @class = "form-control" + (ViewData.ModelState["UserEmail"]?.Errors.Any() == true ? " input-validation-error" : ""),
+                           placeholder = "name@example.com",
+                           id = "email",
+                           required = "required",
+                           type = "email"
+                       })
+                            @Html.ValidationMessageFor(m => m.UserEmail, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+                    <!-- PASSWORD WITH EYE ICON -->
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper password-field">
+                            @Html.TextBoxFor(m => m.UserPassword, new
+
+                            {
+                                               @class = "form-control" + (ViewData.ModelState["UserPassword"]?.Errors.Any() == true ? " input-validation-error" : ""),
+                                               placeholder = "Enter your password",
+                                               id = "password",
+                                               //autocomplete = "new-password",
+                                               autocomplete = "off",
+                                               required = "required"
+                                           })
+                            <span class="eye-icon" onclick="togglePassword()">
+                                <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                            </span>
+                            @Html.ValidationMessageFor(m => m.UserPassword, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+
+                    <button type="submit" class="btn-login">Login</button>
+
+                    <div class="text-center mt-2">
+                        <a href="javascript:void(0)" class="forgot-btn" onclick="showForgott()">Forgot Password?</a>
+                    </div>
+                }
+
+                <div class="text-center mt-4">
+                    <p>Create Account As</p>
+
+                    <!-- 🔥 ADD THIS WRAPPER -->
+                    <div class="create-account-buttons">
+                        <a href="@Url.Action("Register","FarmOwner")" class="create-owner">Farm Owner</a>
+                        <a href="@Url.Action("VisitorRegistrationVH","Visitor")" class="create-visitor">Visitor</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Forgot -->
+            <div id="forgotForm" style="display:none">
+                <h3 class="text-center mb-3">Forgot Password</h3>
+                <input type="email" id="forgotEmail" class="form-control" placeholder="Enter your registered email" autocomplete="off" required>
+
+                <button type="button" id="sendOtpBtn" onclick="sendOTP()" class="btn btn-warning w-100">
+                    Send OTP
+                </button>
+                <div class="text-center mt-2">
+                    <a href="#" onclick="showLogin()">Back</a>
+                </div>
+            </div>
+
+            <!-- OTP -->
+            <div id="otpForm" style="display:none">
+                <h3 class="text-center mb-4">Verify OTP</h3>
+
+                <!-- Timer Display -->
+                <div class="text-center mb-3">
+                    <span id="otpTimer" style="font-size: 18px; color: #ff416c; font-weight: bold;">05:00</span>
+                    <small style="color: #666;"> minutes remaining</small>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Enter OTP</label>
+                    <div class="otp-container">
+                        <input type="text" maxlength="1" class="otp-box">
+                        <input type="text" maxlength="1" class="otp-box">
+                        <input type="text" maxlength="1" class="otp-box">
+                        <input type="text" maxlength="1" class="otp-box">
+                        <input type="text" maxlength="1" class="otp-box">
+                        <input type="text" maxlength="1" class="otp-box">
+                    </div>
+                </div>
+                <button type="button" onclick="verifyOTP()" class="btn btn-success w-100">
+                    Verify OTP
+                </button>
+
+                <!-- Resend OTP button -->
+                <div class="text-center mt-2">
+                    <small>Didn't receive OTP?</small>
+                    <button type="button" id="resendBtn" onclick="resendOTP()"
+                            class="btn btn-link p-0 ms-1"
+                            style="color:black; cursor:not-allowed;" disabled>
+                        Resend OTP
+                    </button>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="javascript:void(0)" onclick="showForgot()">
+                        ← Back to Login
+                    </a>
+                </div>
+
+            </div>
+
+            <div id="resetForm" style="display:none">
+                <h3 class="text-center mb-4">Reset Password</h3>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" class="form-control" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" autocomplete="new-password" required>
+                </div>
+                <button type="button" onclick="resetPassword()" class="btn btn-success w-100">
+                    Update Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#newPassword").val("");
+        $("#confirmPassword").val("");
+    });
+
+    const inputs = document.querySelectorAll(".otp-box");
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", (e) => {
+            if (e.target.value.length === 1) {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            }
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && input.value === "") {
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
+            }
+        });
+    });
+
+
+    // Toggle Password Function
+    function togglePassword() {
+        var pass = document.getElementById("password");
+        var icon = document.getElementById("toggleIcon");
+
+        if (pass.type === "password") {
+            pass.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            pass.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+    // Timer variable
+    let otpTimerInterval;
+
+    // start Timer  function
+    function startOTPTimer(duration = 300) { // 300 seconds = 5 minutes
+        let timer = duration;
+        const timerElement = document.getElementById('otpTimer');
+        const resendBtn = document.getElementById('resendBtn');
+        const resendMessage = document.getElementById('resendMessage');
+
+        // जुना timer असेल तर clear करा
+        if (otpTimerInterval) {
+            clearInterval(otpTimerInterval);
+        }
+
+        // Resend button disable
+        if (resendBtn) {
+            resendBtn.disabled = true;
+            resendBtn.style.color = '#ccc';
+            resendBtn.style.cursor = 'not-allowed';
+        }
+
+        if (resendMessage) {
+            resendMessage.innerHTML = 'Didn\'t receive OTP? ';
+        }
+
+        // Timer start
+        otpTimerInterval = setInterval(function () {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+
+            // Timer display update
+            if (timerElement) {
+                timerElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            }
+
+            timer--;
+
+            // Timer end
+            if (timer < 0) {
+                clearInterval(otpTimerInterval);
+
+                if (timerElement) {
+                    timerElement.textContent = '00:00';
+                }
+
+                // Resend button active
+                if (resendBtn) {
+                    resendBtn.disabled = false;
+                    resendBtn.style.color = '#ff416c';
+                    resendBtn.style.cursor = 'pointer';
+                }
+
+                if (resendMessage) {
+                    resendMessage.innerHTML = 'OTP expired! ';
+                }
+
+                // Sweet Alert
+                Swal.fire({
+                    icon: 'info',
+                    title: 'OTP Expired',
+                    text: 'Your OTP has expired. Please request a new one.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        }, 1000);
+    }
+
+    function sendOTP() {
+
+        const email = $("#forgotEmail").val();
+        const btn = $("#sendOtpBtn");
+
+        if (!email) {
+            Swal.fire("Error", "Please enter email", "error");
+            return;
+        }
+
+        // button disable
+        btn.prop("disabled", true);
+        btn.text("Sending...");
+
+        $.ajax({
+            url: '/FarmOwner/SendOTPRS',
+            type: 'POST',
+            data: {
+                Email: email
+            },
+            success: function (res) {
+
+                if (res.success) {
+
+                    $("#forgotForm").hide();
+                    $("#otpForm").show();
+
+                    startOTPTimer(300);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'OTP Sent',
+                        text: 'Please check your email for OTP',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                } else {
+
+                    // enable button again if failed
+                    btn.prop("disabled", false);
+                    btn.text("Send OTP");
+
+                    Swal.fire("Error", res.message, "error");
+                }
+            },
+            error: function () {
+
+                btn.prop("disabled", false);
+                btn.text("Send OTP");
+
+                Swal.fire("Error", "Something went wrong", "error");
+            }
+        });
+    }
+
+
+    function verifyOTP() {
+        let otp = "";
+        $(".otp-box").each(function () {
+            otp += $(this).val();
+        });
+
+        if (!otp) {
+            Swal.fire("Error", "Please enter OTP", "error");
+            return;
+        }
+
+        $.ajax({
+            url: '/FarmOwner/VerifyOTPRS',
+            type: 'POST',
+            data: {
+                otp: otp
+            },
+            success: function (res) {
+                if (res.success) {
+                    // Timer clear
+                    if (otpTimerInterval) {
+                        clearInterval(otpTimerInterval);
+                    }
+
+                    $("#otpForm").hide();
+                    $("#resetForm").show();
+                } else {
+                    Swal.fire("Invalid OTP", res.message, "error");
+                }
+            }
+        });
+    }
+    function resendOTP() {
+        const btn = $("#resendBtn");
+        const originalText = "Resend OTP";
+
+        // 1. लगेच disable करा
+        btn.prop("disabled", true);
+        btn.css({
+            "color": "#ccc",
+            "cursor": "not-allowed"
+        });
+
+        // 2. 30 सेकंद counter सुरू करा
+        let seconds = 30;
+        btn.text(`Resend OTP (${seconds}s)`);
+
+        const timer = setInterval(function () {
+            seconds--;
+            btn.text(`Resend OTP (${seconds}s)`);
+
+            // 3. 30 सेकंद पूर्ण झाले की enable करा
+            if (seconds <= 0) {
+                clearInterval(timer);
+                btn.prop("disabled", false);
+                btn.css({
+                    "color": "#ff416c",
+                    "cursor": "pointer"
+                });
+                btn.text(originalText);
+            }
+        }, 1000);
+
+        // 4. AJAX call (तुझा existing code)
+        $.ajax({
+            url: '/FarmOwner/ResendOTPRS',
+            type: 'POST',
+            success: function (res) {
+                if (res.success) {
+                    $("#otp").val("");
+                    startOTPTimer(300); // 5 minute timer सुरू करा
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'OTP Resent',
+                        text: 'New OTP has been sent to your email',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire("Error", res.message, "error");
+                }
+            }
+        });
+    }
+
+
+    function resetPassword() {
+
+        var newPass = $("#newPassword").val();
+        var confirmPass = $("#confirmPassword").val();
+
+        // 1. Empty check 🔥
+        if (!newPass || !confirmPass) {
+            Swal.fire("Error", "Please enter password", "error");
+            return;
+        }
+
+        // 2. Length check (optional but best)
+        if (newPass.length < 6) {
+            Swal.fire("Error", "Password must be at least 6 characters", "error");
+            return;
+        }
+
+        // 3. Match check
+        if (newPass !== confirmPass) {
+            Swal.fire("Error", "Passwords do not match", "error");
+            return;
+        }
+
+        // 4. AJAX call
+        $.ajax({
+            url: '/FarmOwner/ResetPasswordRS',
+            type: 'POST',
+            data: {
+                newPassword: newPass,
+                confirmPassword: confirmPass
+            },
+            success: function (res) {
+                if (res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Password Updated',
+                        text: 'Your password updated successfully'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            }
+        });
+    }
+
+    //function resetPassword() {
+    //    if ($("#newPassword").val() != $("#confirmPassword").val()) {
+    //        Swal.fire("Error", "Passwords do not match", "error");
+    //        return;
+    //    }
+
+    //    $.ajax({
+    //        url: '/FarmOwner/ResetPasswordRS',
+    //        type: 'POST',
+    //        data: {
+    //            newPassword: $("#newPassword").val(),
+    //            confirmPassword: $("#confirmPassword").val()
+    //        },
+    //        success: function (res) {
+    //            if (res.success) {
+    //                Swal.fire({
+    //                    icon: 'success',
+    //                    title: 'Password Updated',
+    //                    text: 'Your password updated successfully'
+    //                }).then(() => {
+    //                    location.reload();
+    //                });
+    //            }
+    //        }
+    //    });
+    //}
+
+    function showForgott() {
+        $("#loginForm").hide();
+        $("#forgotForm").show();
+    }
+
+    function showLogin() {
+
+        $("#forgotForm").hide();
+        $("#loginForm").show();
+
+        // reset send otp button
+        $("#sendOtpBtn").prop("disabled", false);
+        $("#sendOtpBtn").text("Send OTP");
+
+        // clear email
+        $("#forgotEmail").val("");
+    }
+    function showForgot() {
+
+        if (otpTimerInterval) {
+            clearInterval(otpTimerInterval);
+        }
+
+        $("#otpForm").hide();
+        $("#loginForm").show();
+
+        $("#forgotForm").hide();
+
+
+        $("#forgotEmail").val("");
+        $("#otp").val("");
+        $("#newPassword").val("");
+        $("#confirmPassword").val("");
+
+
+        $("#sendOtpBtn").prop("disabled", false);
+        $("#sendOtpBtn").text("Send OTP");
+
+
+    }
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.location.href = '/FarmOwner/Logout';
+    };
+</script>
