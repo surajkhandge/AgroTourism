@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -936,6 +937,130 @@ namespace GSTAgroTourism.Controllers
                 status = model.RefundStatus
 
             });
+        }
+        #endregion
+
+        #region Atharv
+
+        public ActionResult AboutUsAG()
+        {
+            return View();
+        }
+
+        public ActionResult SupportAG()
+        {
+            return View();
+        }
+
+        public ActionResult TrustSafetyAG()
+        {
+            return View();
+        }
+
+        // ================================
+        // 🔹 1. GET VISITED FARMS
+        // ================================
+        public async Task<JsonResult> GetVisitedFarmsAG()
+        {
+            try
+            {
+                string visitorCode = Session["VisitorCode"]?.ToString();
+
+                if (string.IsNullOrEmpty(visitorCode))
+                {
+                    return Json(new { error = "Session expired" }, JsonRequestBehavior.AllowGet);
+                }
+
+                //BALVisitor obj = new BALVisitor();
+                var ds = await objbalvisitor.GetVisitedFarmsAG(visitorCode);
+
+                var list = new List<object>();
+
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        list.Add(new
+                        {
+                            Value = row["Value"].ToString(),
+                            Text = row["Text"].ToString()
+                        });
+                    }
+                }
+
+                return Json(list, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        // ================================
+        // 🔹 2. GET SUBJECT TYPES
+        // ================================
+        public async Task<JsonResult> GetSubjectTypesAG()
+        {
+            try
+            {
+                //BALVisitor obj = new BALVisitor();
+                var ds = await objbalvisitor.GetSubjectTypesAG();
+
+                var list = new List<object>();
+
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        list.Add(new
+                        {
+                            Value = row["Value"].ToString(),
+                            Text = row["Text"].ToString()
+                        });
+                    }
+                }
+
+                return Json(list, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ================================
+        // 🔹 3. SUBMIT COMPLAINT
+        // ================================
+        [HttpPost]
+        public async Task<JsonResult> SubmitComplaintAG(string farmCode, string subjectType, string subject, string description)
+        {
+            try
+            {
+                string visitorCode = Session["VisitorCode"]?.ToString();
+
+                if (string.IsNullOrEmpty(visitorCode))
+                {
+                    return Json(new { status = "ERROR", message = "Session expired" });
+                }
+
+                //BALVisitor obj = new BALVisitor();
+                var ds = await objbalvisitor.InsertComplaintAG(visitorCode, farmCode, subjectType, subject, description);
+
+                // ✅ SAFE CHECK
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    return Json(new { status = "ERROR", message = "Something went wrong" });
+                }
+
+                return Json(new
+                {
+                    status = ds.Tables[0].Rows[0]["Status"]?.ToString(),
+                    message = ds.Tables[0].Rows[0]["Message"]?.ToString()
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = "ERROR", message = ex.Message });
+            }
         }
         #endregion
     }

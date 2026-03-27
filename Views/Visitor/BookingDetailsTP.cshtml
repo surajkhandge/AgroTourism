@@ -127,6 +127,22 @@
             transform: translateY(-1px);
         }
 
+    /* VIEW INVOICE BUTTON */
+
+    .addReviewBtn {
+        background: #2f5d9a;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+        .addReviewBtn:hover {
+            background: #2f5d9a;
+            transform: translateY(-1px);
+        }
+
     /* HOVER EFFECT */
 
     .card {
@@ -305,7 +321,7 @@
         <a class="btn btn-primary addReviewBtn"
            href="@Url.Action("AddReviewSKK","Visitor",
    new { bookingCode = Model.BookingCode })">
-            <i class="fa-solid fa-star me-1"></i> Add Review
+            <i class="fa-solid me-1"></i> Add Review
         </a>
 
     </div>

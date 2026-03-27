@@ -41,13 +41,14 @@
         border-radius: 6px;
         padding: 6px 12px;
         margin-right: 6px;
-        font-weight: 600;
+        font-weight: 800;
     }
 
     /* EXCEL */
     .dt-buttons .excelBtn {
         border: 2px solid #198754 !important;
         color: #198754 !important;
+        border-radius: 10px !important;
     }
 
         .dt-buttons .excelBtn:hover {
@@ -59,6 +60,7 @@
     .dt-buttons .pdfBtn {
         border: 2px solid #dc3545 !important;
         color: #dc3545 !important;
+        border-radius: 10px !important;
     }
 
         .dt-buttons .pdfBtn:hover {
@@ -70,6 +72,7 @@
     .dt-buttons .printBtn {
         border: 2px solid #6c757d !important;
         color: #6c757d !important;
+        border-radius: 10px !important;
     }
 
         .dt-buttons .printBtn:hover {
@@ -396,7 +399,7 @@
                 // ================= EXCEL =================
                 {
                     extend: 'excelHtml5',
-                    text: ' <i class="fa fa-file-excel"></i>',
+                    text: ' <i class="fa fa-file-excel fa-2x"></i>',
                     className: 'btn excelBtn btn-outline-success',
 
                     title: 'My Bookings',
@@ -452,7 +455,7 @@
                 // ================= PDF =================
                 {
                     extend: 'pdfHtml5',
-                    text: '<i class="fa fa-file-pdf"></i>',
+                    text: '<i class="fa fa-file-pdf fa-2x"></i>',
                     className: 'btn pdfBtn btn-outline-danger',
 
                     title: 'My Bookings',
@@ -522,7 +525,7 @@
                 // ================= PRINT =================
                 {
                     extend: 'print',
-                    text: '<i class="fa-solid fa-print"></i>',
+                    text: '<i class="fa-solid fa-print fa-2x"></i>',
                     className: 'btn printBtn btn-outline-secondary',
 
                     title: 'My Bookings',

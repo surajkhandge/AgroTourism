@@ -1,0 +1,358 @@
+﻿
+@{
+    ViewBag.Title = "SupportAG";
+    Layout = "~/Views/Shared/Visitor.cshtml";
+}
+
+<style>
+    .form-control,
+    .form-select {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .is-invalid {
+        border: 2px solid #dc3545 !important;
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.4);
+        transform: scale(1.01);
+    }
+
+    .is-valid {
+        border: 2px solid #28a745 !important;
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.4);
+        transform: scale(1.01);
+    }
+
+    .error {
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+        .error.show {
+            opacity: 1;
+        }
+</style>
+<!-- ================= SUPPORT HERO ================= -->
+<section class="container mt-5 pt-5">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold">How Can We Help?</h3>
+        <p class="text-muted">Search our knowledge base or browse FAQs</p>
+    </div>
+</section>
+
+<!-- ================= COMPLAINT FORM ================= -->
+<section class="container-sm bg-white mb-5">
+    <h5 class="fw-bold mb-3">Submit a Complaint</h5>
+
+    <div class="complaint-box p-4">
+        <div class="mb-3">
+            <label>Farm Name</label>
+            <select id="FarmHouseDropdown" class="form-select"></select>
+            <small class="text-danger error" id="farmError"></small>
+        </div>
+
+        <div class="mb-3">
+            <label>Type of Subject</label>
+            <select id="SubjectTypeDropdown" class="form-select"></select>
+            <small class="text-danger error" id="typeError"></small>
+        </div>
+
+        <div class="mb-3">
+            <label>Subject</label>
+            <input type="text" id="Subject" class="form-control" />
+            <small class="text-danger error" id="subjectError"></small>
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea id="Description" class="form-control"></textarea>
+            <small class="text-danger error" id="descError"></small>
+        </div>
+
+        <button type="button" id="btnSubmit" class="btn btn-outline-success btn-rounded">
+            <i class="fa fa-check me-1"></i> Submit
+        </button>
+    </div>
+</section>
+
+<!-- ================= FAQ SECTION ================= -->
+<section class="container mb-5">
+    <h5 class="fw-bold mb-3">Frequently Asked Questions</h5>
+
+    <div class="accordion" id="faqAccordion">
+
+        <!-- FAQ 1 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq1">
+                    How do I get started with Farmhouse?
+                </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show"
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Visit the homepage, explore categories, and create an account
+                    to save preferences and track bookings.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq2">
+                    Can I change my account information?
+                </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse"
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Yes, go to your profile settings and update your details anytime.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq3">
+                    What is the cancellation policy for bookings?
+                </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse"
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Cancellation policies depend on the farmhouse listing.
+                    Please check the specific property's cancellation terms.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq4">
+                    What payment methods are accepted?
+                </button>
+            </h2>
+            <div id="faq4" class="accordion-collapse collapse"
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    We accept UPI, Credit/Debit cards, Net Banking and Wallet payments.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq5">
+                    How does Farmhouse ensure my data is safe?
+                </button>
+            </h2>
+            <div id="faq5" class="accordion-collapse collapse"
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    We use encrypted connections and secure authentication systems
+                    to protect your personal information.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+
+    function validateForm() {
+
+        let isValid = true;
+
+        let farm = $("#FarmHouseDropdown").val();
+        let type = $("#SubjectTypeDropdown").val();
+        let subject = $("#Subject").val().trim();
+
+        let regex = /^[a-zA-Z0-9 ]+$/;
+
+        // RESET ONLY STATES (NOT HARSH REMOVE)
+        $(".form-control, .form-select").removeClass("is-invalid is-valid");
+        $(".error").removeClass("show").text("");
+
+        // FARM
+        if (!farm) {
+            $("#FarmHouseDropdown").addClass("is-invalid");
+            $("#farmError").text("Please select farm").addClass("show");
+            isValid = false;
+        } else {
+            $("#FarmHouseDropdown").addClass("is-valid");
+        }
+
+        // TYPE
+        if (!type) {
+            $("#SubjectTypeDropdown").addClass("is-invalid");
+            $("#typeError").text("Please select subject type").addClass("show");
+            isValid = false;
+        } else {
+            $("#SubjectTypeDropdown").addClass("is-valid");
+        }
+
+        // SUBJECT
+        if (!subject) {
+            $("#Subject").addClass("is-invalid");
+            $("#subjectError").text("Subject is required").addClass("show");
+            isValid = false;
+        }
+        else if (!regex.test(subject)) {
+            $("#Subject").addClass("is-invalid");
+            $("#subjectError").text("Only letters and numbers allowed").addClass("show");
+            isValid = false;
+        }
+        else {
+            $("#Subject").addClass("is-valid");
+        }
+
+        return isValid;
+    }
+
+    $("#Subject").on("input", function () {
+        validateForm();
+    });
+
+    $("#FarmHouseDropdown, #SubjectTypeDropdown").on("change", function () {
+        validateForm();
+    });
+
+    $(document).ready(function () {
+        loadFarms();
+        loadSubjects();
+    });
+
+    function loadFarms() {
+
+        console.log("🚀 Calling GetVisitedFarmsAG...");
+
+        $.ajax({
+            url: '/Visitor/GetVisitedFarmsAG',
+            type: 'GET',
+
+            success: function (data) {
+
+                console.log("✅ Response from server:", data);
+
+                let ddl = $("#FarmHouseDropdown");
+                ddl.empty();
+
+                // 🔹 Handle session error
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                ddl.append('<option value="">Select Farm</option>');
+
+                // 🔹 Handle empty data
+                if (!data || data.length === 0) {
+                    console.warn("⚠ No farms found for this visitor");
+                    ddl.append('<option value="">No Farms Available</option>');
+                    return;
+                }
+
+                // 🔹 Populate dropdown
+                $.each(data, function (i, item) {
+                    ddl.append(`<option value="${item.Value}">${item.Text}</option>`);
+                });
+            },
+
+            error: function (xhr, status, error) {
+                console.error("❌ AJAX Error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Failed to load farms. Please try again.'
+                });
+            }
+        });
+    }
+
+    // LOAD SUBJECT TYPES
+    function loadSubjects() {
+        $.ajax({
+            url: '/Visitor/GetSubjectTypesAG',
+            type: 'GET',
+            success: function (data) {
+
+                let ddl = $("#SubjectTypeDropdown");
+                ddl.empty();
+                ddl.append('<option value="">Select Type</option>');
+
+                $.each(data, function (i, item) {
+                    ddl.append(`<option value="${item.Value}">${item.Text}</option>`);
+                });
+            }
+        });
+    }
+
+    // SUBMIT COMPLAINT
+    $("#btnSubmit").click(function () {
+
+        let farm = $("#FarmHouseDropdown").val();
+        let subjectType = $("#SubjectTypeDropdown").val();
+        let subject = $("#Subject").val();
+        let description = $("#Description").val();
+
+        if (description.length > 200) {
+            description = description.substring(0, 50);
+        }
+
+        if (!validateForm()) {
+            return;
+        }
+
+        $.ajax({
+            url: '/Visitor/SubmitComplaintAG',
+            type: 'POST',
+            data: {
+                farmCode: farm,
+                subjectType: subjectType,
+                subject: subject,
+                description: description
+            },
+            success: function (res) {
+
+                if (res.status === "SUCCESS") {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: res.message,
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+
+                } else {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: res.message,
+                        confirmButtonColor: '#dc3545'
+                    });
+
+                }
+            }
+        });
+
+    });
+
+</script>
