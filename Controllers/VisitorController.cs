@@ -138,6 +138,7 @@ namespace GSTAgroTourism.Controllers
                 return RedirectToAction("Index");
 
             string farmCode = Session["FarmCode"]?.ToString();
+            string packageCode = Session["PackageCode"]?.ToString();
             string packageName = Session["PackageName"]?.ToString();
             string checkIn = Session["CheckIn"]?.ToString();
             int nights = Session["Nights"] != null ? Convert.ToInt32(Session["Nights"]) : 1;
@@ -154,13 +155,22 @@ namespace GSTAgroTourism.Controllers
             model.PackageName = data.PackageName;
             model.RoomTypeName = data.RoomTypeName;
             model.MealTypeName = data.MealTypeName;
-            model.PackagePrice = data.PackagePrice;
+            model.NoOfGuest = data.NumberOfGuests;
+            Session["NoOfGuest"] = model.NoOfGuest;
             model.DiscountPercent = data.DiscountPercent;
             model.DiscountAmount = data.DiscountAmount;
-            model.FinalPrice = data.TotalPrice;
+            model.PackagePrice = Session["PackagePrice"] != null
+       ? Convert.ToDecimal(Session["PackagePrice"])
+       : data.PackagePrice;
+
+            if (model.PackagePrice == 0)
+                model.PackagePrice = data.PackagePrice;
+
+            model.FinalPrice = model.PackagePrice;
             model.NoOfGuest = data?.NoOfGuest ?? 0;
             System.Diagnostics.Debug.WriteLine("NoOfGuest from data: " + data.NoOfGuest);
-
+            model.PayableAmount = model.FinalPrice;
+            Session["TotalAmount"] = model.FinalPrice;
             /* Dates */
             model.CheckIn = Convert.ToDateTime(checkIn);
             model.Nights = nights;
@@ -168,16 +178,19 @@ namespace GSTAgroTourism.Controllers
 
             /* Activities */
             var allActivities = await objbalvisitor.GetPackageActivitiesSK(farmCode);
-            var codes = data.ActivityCode.Split(',');
+            var codes = string.IsNullOrEmpty(data.ActivityCode)
+                        ? new string[0]
+                        : data.ActivityCode.Split(',');
             model.Activities = allActivities.FindAll(a => codes.Contains(a.ActivityCode));
             model.IsPackageBooking = true;
             return View("ConfirmBookingSK", model);
         }
         /* Booking Session  */
         [HttpPost]
-        public ActionResult SetBookingSessionSK(string farmCode, string packageName, decimal price, int days, int nights, string checkIn, string checkOut)
+        public ActionResult SetBookingSessionSK(string farmCode, string packageCode, string packageName, decimal price, int days, int nights, string checkIn, string checkOut)
         {
             Session["FarmCode"] = farmCode;
+            Session["PackageCode"] = packageCode;
             Session["PackageName"] = packageName;
             Session["PackagePrice"] = price;
             Session["Days"] = days;
@@ -185,6 +198,7 @@ namespace GSTAgroTourism.Controllers
             Session["CheckIn"] = checkIn;
             Session["CheckOut"] = checkOut;
             return Json("ok");
+
         }
         #endregion Suraj
 
@@ -351,8 +365,10 @@ namespace GSTAgroTourism.Controllers
         [HttpGet]
         public async Task<ActionResult> SelectRoomsVH(string farmCode)
         {
-            Session.Remove("PackageName");
-            Session.Remove("PackagePrice");
+            if (Session["PackageName"] == null)
+            {
+                Session.Remove("PackagePrice");
+            }
             Session["FarmHouseCode"] = farmCode;
             RoomBookingVH model = new RoomBookingVH();
             model.Rooms = new List<RoomSelectionVH>();
@@ -605,17 +621,13 @@ namespace GSTAgroTourism.Controllers
 
                 return View(model);
             }
-
+            Session["GuestList"] = model.Guests;
             // ⭐ IMPORTANT CONDITION
 
             if (Session["PackageName"] != null)
-            {
                 return RedirectToAction("ConfirmBookingSK");
-            }
             else
-            {
                 return RedirectToAction("ConfirmBookingVH");
-            }
 
         }
 
@@ -652,7 +664,8 @@ namespace GSTAgroTourism.Controllers
 
                 model.IsPackageBooking = true;
 
-                string farmCode = Session["FarmCode"].ToString();
+                string farmCode = Session["FarmCode"]?.ToString()
+                           ?? Session["FarmHouseCode"]?.ToString();
                 string packageName = Session["PackageName"].ToString();
                 int nights = Convert.ToInt32(Session["Nights"]);
                 string checkIn = Session["CheckIn"].ToString();
@@ -663,17 +676,31 @@ namespace GSTAgroTourism.Controllers
                 model.PackageName = data.PackageName;
                 model.RoomTypeName = data.RoomTypeName;
                 model.MealTypeName = data.MealTypeName;
-                model.PackagePrice = data.PackagePrice;
+
                 model.DiscountPercent = data.DiscountPercent;
                 model.DiscountAmount = data.DiscountAmount;
-                model.FinalPrice = data.TotalPrice;
+                if (Session["PackagePrice"] != null)
+                    model.PackagePrice = Convert.ToDecimal(Session["PackagePrice"]);
+                else
+                    model.PackagePrice = data.TotalPrice;
+
+                if (model.PackagePrice == 0)
+                    model.PackagePrice = data.PackagePrice;
+
+                model.FinalPrice = model.PackagePrice; if (model.PackagePrice == 0)
+                    model.PackagePrice = data.PackagePrice;
+
+                model.FinalPrice = model.PackagePrice;
                 model.CheckIn = Convert.ToDateTime(checkIn);
                 model.Nights = nights;
                 model.CheckOut = model.CheckIn.AddDays(nights);
                 model.NoOfGuest = data?.NoOfGuest ?? 0;
                 model.PayableAmount = model.FinalPrice;
+                Session["TotalAmount"] = model.FinalPrice;
                 var allActivities = await objbalvisitor.GetPackageActivitiesSK(farmCode);
-                var codes = data.ActivityCode.Split(',');
+                var codes = string.IsNullOrEmpty(data.ActivityCode)
+                            ? new string[0]
+                            : data.ActivityCode.Split(',');
                 model.Activities = allActivities.FindAll(a => codes.Contains(a.ActivityCode));
                 return View("ConfirmBookingSK", model);
 
@@ -1136,8 +1163,22 @@ namespace GSTAgroTourism.Controllers
             model.FarmHouseName = Session["FarmHouseName"]?.ToString();
             model.CheckinDate = Convert.ToDateTime(Session["CheckinDate"]);
             model.CheckoutDate = Convert.ToDateTime(Session["CheckoutDate"]);
-            model.NoOfGuest = Convert.ToInt32(Session["NoOfGuest"]);
-            model.TotalAmount = Convert.ToDecimal(Session["TotalAmount"]); ;
+
+            var guests = Session["GuestList"] as List<GuestVH>;
+
+            if (guests != null)
+            {
+                model.NoOfGuest = guests.Count;
+                Session["NoOfGuest"] = guests.Count;
+            }
+            else
+            {
+                model.NoOfGuest = Convert.ToInt32(Session["NoOfGuest"]);
+            }
+
+            model.PackageCode = Session["PackageCode"]?.ToString();
+
+            model.TotalAmount = Convert.ToDecimal(Session["TotalAmount"]);
             var client = new RazorpayClient(
             ConfigurationManager.AppSettings["RazorpayKey"],
             ConfigurationManager.AppSettings["RazorpaySecret"]
@@ -1171,6 +1212,7 @@ namespace GSTAgroTourism.Controllers
             Session["NoOfGuest"] = model.NoOfGuest;
             Session["PaymentTypeCode"] = model.PaymentTypeCode;
             Session["InvoiceNumber"] = invoiceNumber;
+
 
             bool result = await objbalvisitor.VerifyandConfirmPaymentAsyncSt(model);
 

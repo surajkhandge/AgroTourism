@@ -12,6 +12,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
+    .package-card {
+        position: relative;
+    }
+
+    .package-selected {
+        background: #edf6f1;
+        border: 2px solid #2d6a4f;
+        transform: scale(1.02);
+    }
+
+        .package-selected .package-select-btn {
+            background: #1b4332;
+        }
+
     body {
         background-color: #fafafa;
     }
@@ -747,18 +761,15 @@
 
                             <div class="package-slide">
 
-                                <div class="package-card"
+                                <div class="package-card packageCard"
                                      data-name="@pkg.PackageName"
                                      data-price="@pkg.TotalPrice"
                                      data-days="@pkg.NoOfDays"
                                      data-nights="@pkg.NoOfNight"
-                                     onclick="selectPackage(this)">
+                                     data-guests="@pkg.PackageGuests">
 
-
-                                    <img src="@Url.Content("~/Uploads/Common/Packages/" + pkg.ImagePath)"
-                                         class="package-img"
-                                         onerror="this.src='/Content/images/default-package.jpg'">
-
+                                    <img class="package-img"
+                                         src="@Url.Content("~/Uploads/Common/Packages/"+pkg.ImagePath)" />
 
                                     <div class="package-body">
 
@@ -766,16 +777,14 @@
 
                                             <div>
 
-                                                <h6 class="package-title">
-
+                                                <h5 class="package-title">
                                                     @pkg.PackageName
-
-                                                </h6>
+                                                </h5>
 
                                                 <div class="package-days">
 
-                                                    @pkg.NoOfDays Days /
-                                                    @pkg.NoOfNight Nights
+                                                    📅 @pkg.NoOfDays Days
+                                                    🌙 @pkg.NoOfNight Nights
 
                                                 </div>
 
@@ -808,32 +817,40 @@
                                         <ul class="package-features-modern">
 
                                             <li>
-
                                                 <i class="fa fa-bed"></i>
-
-                                                @pkg.RoomTypeName
-
+                                                @pkg.PackageRooms Rooms
                                             </li>
 
                                             <li>
+                                                <i class="fa fa-users"></i>
+                                                @pkg.PackageGuests Guests
+                                            </li>
 
+                                            <li>
                                                 <i class="fa fa-utensils"></i>
-
-                                                @pkg.MealTypeName
-
+                                                @pkg.PackageMeals
                                             </li>
 
                                             <li>
+                                                <i class="fa fa-door-open"></i>
+                                                @pkg.RoomTypeName
+                                            </li>
 
-                                                <i class="fa fa-tree"></i>
+                                            <li>
+                                                <i class="fa fa-star"></i>
 
-                                                Farm Activities
+                                                <div style="font-size:13px">
+
+                                                    @Html.Raw(pkg.PackageActivities.Replace("|", "<br/>"))
+
+                                                </div>
 
                                             </li>
 
                                         </ul>
 
-                                        <button class="package-select-btn">
+                                        <button class="package-select-btn"
+                                                onclick="selectPackage(this.parentElement.parentElement)">
 
                                             Select Package
 
@@ -990,7 +1007,8 @@ new { farmCode = Model.FarmHouseCode })"
 let selectedPackageName="";
 let selectedPrice="";
 let selectedDays="";
-let selectedNights="";
+    let selectedNights = "";
+    let selectedGuests = "";
 
 /* ===== DATE SETUP ===== */
 
@@ -1104,75 +1122,77 @@ $("#availabilityResult").html(
 
 /* ===== PACKAGE SELECT ===== */
 
-function selectPackage(card){
+    function selectPackage(card) {
 
-let checkIn=$("#hdCheckIn").val();
+        let checkIn = $("#hdCheckIn").val();
 
-let checkOut=$("#hdCheckOut").val();
+        let checkOut = $("#hdCheckOut").val();
 
-if(!checkIn || !checkOut){
+        if (!checkIn || !checkOut) {
 
-showToast("Select dates first","warning");
+            showToast("Select dates first", "warning");
 
-return;
+            return;
 
-}
+        }
 
-$(".package-card").removeClass("package-selected");
+        $(".package-card").removeClass("package-selected");
 
-$(card).addClass("package-selected");
+        $(card).addClass("package-selected");
 
-selectedPackageName=$(card).data("name");
+        selectedPackageName = $(card).data("name");
 
-selectedPrice=$(card).data("price");
+        selectedPrice = $(card).data("price");
 
-selectedDays=$(card).data("days");
+        selectedDays = $(card).data("days");
 
-selectedNights=$(card).data("nights");
+        selectedNights = $(card).data("nights");
+        selectedGuests = $(card).data("guests");
 
-showToast("Package Selected","success");
+        showToast("Package Selected", "success");
 
-}
+    }
 
 /* ===== PACKAGE VALIDATION ===== */
+    function validatePackages() {
 
-function validatePackages(){
+        let checkIn = $("#hdCheckIn").val();
+        let checkOut = $("#hdCheckOut").val();
 
-let checkIn=$("#hdCheckIn").val();
+        if (!checkIn || !checkOut) {
 
-let checkOut=$("#hdCheckOut").val();
+            $(".package-card").css("opacity", "1");
+            $(".package-card").css("pointer-events", "auto");
 
-if(!checkIn || !checkOut) return;
+            return;
 
-let start=new Date(convertToISO(checkIn));
+        }
 
-let end=new Date(convertToISO(checkOut));
+        let start = new Date(convertToISO(checkIn));
+        let end = new Date(convertToISO(checkOut));
 
-let nights=Math.ceil((end-start)/(1000*60*60*24));
+        let nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
-$(".package-card").each(function(){
+        $(".package-card").each(function () {
 
-let pkgNights=parseInt($(this).data("nights"));
+            let pkgNights = parseInt($(this).data("nights"));
 
-if(pkgNights<=nights){
+            if (pkgNights <= nights) {
 
-$(this).css("opacity","1");
+                $(this).css("opacity", "1");
+                $(this).css("pointer-events", "auto");
 
-$(this).css("pointer-events","auto");
+            }
+            else {
 
-}
+                $(this).css("opacity", "0.35");
+                $(this).css("pointer-events", "none");
 
-else{
+            }
 
-$(this).css("opacity","0.4");
+        });
 
-$(this).css("pointer-events","none");
-
-}
-
-});
-
-}
+    }
 
 /* ===== BOOKING ===== */
 
@@ -1194,8 +1214,9 @@ packageName:selectedPackageName,
 price:selectedPrice,
 days:selectedDays,
 nights:selectedNights,
+guests:selectedGuests,
 checkIn:convertToISO(checkIn),
-    checkOut: finalOut
+checkOut: finalOut
 },
 
 function(){

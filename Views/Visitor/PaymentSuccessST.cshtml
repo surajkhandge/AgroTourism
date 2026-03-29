@@ -1,12 +1,13 @@
 ﻿
 @{
     ViewBag.Title = "Payment Success";
+    Layout = "~/Views/Shared/Visitor.cshtml";
 }
 <div class="container mt-5">
     <div class="row g-4">
 
-        <div class ="col-md-8">
-            
+        <div class="col-md-8">
+
             <div class="card shadow-lg border-0 rounded-4 p-4">
 
                 <div class="text-center">
@@ -23,7 +24,7 @@
                         Your Booking payment has been processed successfully.
                     </p>
                 </div>
-                <hr/>
+                <hr />
                 <div class="row text-center">
 
                     <div class="col-md-4">
@@ -48,7 +49,7 @@
                     </a>
 
                     <a href="/Visitor/DownloadInvoiceST"
-                       class="btn btn-outline-dark me-3"> 
+                       class="btn btn-outline-dark me-3">
                         Dowload Invoice
                     </a>
 
@@ -70,7 +71,7 @@
                 <p class="text-muted mb-1">Farmhouse</p>
                 <strong>@ViewBag.FarmHouse</strong>
 
-                <hr/>
+                <hr />
 
                 <p class="text-muted mb-1">Visiting Dates</p>
 
@@ -78,7 +79,7 @@
                     @ViewBag.CheckinDate - @ViewBag.CheckoutDate
                 </strong>
 
-                <hr/>
+                <hr />
 
                 <p class="text-muted mb-1">Guests</p>
                 <strong>@ViewBag.NoOfGuest</strong>
@@ -97,15 +98,15 @@
 </div>
 <style>
     .success-icon {
-        width:90px;
-        height:90px;
-        border-radius:50%;
-        background:#e8f5e9;
-        color:#198754;
-        font-size:50px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        margin:auto;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: #e8f5e9;
+        color: #198754;
+        font-size: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
     }
 </style>
