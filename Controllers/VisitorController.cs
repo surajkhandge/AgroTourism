@@ -962,17 +962,76 @@ namespace GSTAgroTourism.Controllers
         [HttpPost]
         public async Task<ActionResult> ConfirmCancelBookingTP(string bookingCode, string cancelReason)
         {
-            if (Session["VisitorCode"] == null) return Json(new { success = false });
-            string visitorCode = Session["VisitorCode"].ToString();
-            BookingTP model = await objbalvisitor.UpdateCancelStatusTP(bookingCode, visitorCode, cancelReason);
-            return Json(new
-            {
-                success = true,
-                refund = model.RefundedAmount,
-                status = model.RefundStatus
+            if (Session["VisitorCode"] == null)
+                return Json(new { success = false });
 
-            });
+            try
+            {
+                string visitorCode = Session["VisitorCode"].ToString();
+                BookingTP model = await objbalvisitor.UpdateCancelStatusTP(bookingCode, visitorCode, cancelReason);
+
+                bool razorpayRefundSuccess = false;
+
+                if (model.RefundedAmount > 0 && !string.IsNullOrEmpty(model.RazorpayPaymentId))
+                {
+                    try
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Attempting refund - PaymentId: {model.RazorpayPaymentId}, Amount: {model.RefundedAmount}");
+
+                        razorpayRefundSuccess = await objbalvisitor.RefundPaymentAsyncST(
+                            model.RazorpayPaymentId,
+                            model.RefundedAmount
+                        );
+
+                        System.Diagnostics.Debug.WriteLine($"Refund result: {razorpayRefundSuccess}");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Razorpay refund failed in ConfirmCancelBookingTP: {ex.Message}");
+                        System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                        if (ex.InnerException != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                        }
+                        razorpayRefundSuccess = false;
+                    }
+                    System.Diagnostics.Debug.WriteLine(model.RazorpayPaymentId);
+                    System.Diagnostics.Debug.WriteLine(model.RefundedAmount);
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    refund = model.RefundedAmount,
+                    status = model.RefundStatus,
+                    razorpayRefund = razorpayRefundSuccess,
+                    bookingCode = bookingCode
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ConfirmCancelBookingTP: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                return Json(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    refund = 0,
+                    status = "Error",
+                    razorpayRefund = false
+                });
+            }
         }
+
+        //return Json(new
+        //{
+        //    success = true,
+        //    refund = model.RefundedAmount,
+        //    status = model.RefundStatus,
+        //    razorpayRefund = false
+        //});
+        //}
         #endregion
 
         #region Atharv

@@ -121,3 +121,81 @@
     </div>
 
 </div>
+<script>
+    function confirmCancelBooking() {
+        var bookingCode = document.getElementById("bookingCode").value;
+        var cancelReason = document.getElementById("cancelReason").value;
+
+        if (!cancelReason.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required',
+                text: 'Please enter a reason for cancellation.'
+            });
+            return;
+        }
+
+        // Disable button to prevent double click
+        var btn = document.querySelector('.btn-danger');
+        btn.disabled = true;
+        btn.innerText = 'Processing...';
+
+        $.ajax({
+            url: '/Visitor/ConfirmCancelBookingTP',
+            type: 'POST',
+            data: {
+                bookingCode: bookingCode,
+                cancelReason: cancelReason
+            },
+            success: function (result) {
+                if (result.success) {
+                    // Close modal
+                    $('#cancelBookingModal').modal('hide');
+
+                    if (result.refund > 0 && result.razorpayRefund) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Booking Cancelled',
+                            text: '₹' + result.refund + ' refund has been initiated successfully.'
+                        }).then(function () {
+                            location.reload();
+                        });
+                    } else if (result.refund > 0 && !result.razorpayRefund) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Booking Cancelled',
+                            text: 'Booking cancelled but refund could not be processed automatically. Contact support.'
+                        }).then(function () {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Booking Cancelled',
+                            text: 'Your booking has been cancelled. No refund is applicable.'
+                        }).then(function () {
+                            location.reload();
+                        });
+                    }
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = 'Confirm Cancellation';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Could not cancel booking. Please try again.'
+                    });
+                }
+            },
+            error: function () {
+                btn.disabled = false;
+                btn.innerText = 'Confirm Cancellation';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again.'
+                });
+            }
+        });
+    }
+</script>

@@ -5,8 +5,8 @@
     Layout = "~/Views/Shared/Visitor.cshtml";
 
 
-}
-
+}<!-- Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
 <!-- DataTables -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -14,7 +14,8 @@
 <!-- Responsive -->
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
-
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <!-- Buttons -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
@@ -37,55 +38,44 @@
     .dt-buttons .dt-button {
         background: #fff !important;
         border: 2px solid #dee2e6 !important;
-        border-radius: 8px;
-        height: 38px;
-        width: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin-right: 6px;
+        font-weight: 600;
     }
 
-    .dt-buttons {
-        display: flex;
-        gap: 8px;
+    /* EXCEL */
+    .dt-buttons .excelBtn {
+        border: 2px solid #198754 !important;
+        color: #198754 !important;
     }
 
-        /* EXCEL */
-        .dt-buttons .excelBtn {
-            border: 2px solid #198754 !important;
-            color: #198754 !important;
-            border-radius: 10px !important;
+        .dt-buttons .excelBtn:hover {
+            background: #198754 !important;
+            color: #fff !important;
         }
 
-            .dt-buttons .excelBtn:hover {
-                background: #198754 !important;
-                color: #fff !important;
-            }
+    /* PDF */
+    .dt-buttons .pdfBtn {
+        border: 2px solid #dc3545 !important;
+        color: #dc3545 !important;
+    }
 
-        /* PDF */
-        .dt-buttons .pdfBtn {
-            border: 2px solid #dc3545 !important;
-            color: #dc3545 !important;
-            border-radius: 10px !important;
+        .dt-buttons .pdfBtn:hover {
+            background: #dc3545 !important;
+            color: #fff !important;
         }
 
-            .dt-buttons .pdfBtn:hover {
-                background: #dc3545 !important;
-                color: #fff !important;
-            }
+    /* PRINT */
+    .dt-buttons .printBtn {
+        border: 2px solid #6c757d !important;
+        color: #6c757d !important;
+    }
 
-        /* PRINT */
-        .dt-buttons .printBtn {
-            border: 2px solid #6c757d !important;
-            color: #6c757d !important;
-            border-radius: 10px !important;
+        .dt-buttons .printBtn:hover {
+            background: #6c757d !important;
+            color: #fff !important;
         }
-
-            .dt-buttons .printBtn:hover {
-                background: #6c757d !important;
-                color: #fff !important;
-            }
 
     /* TABS CONTAINER */
 
@@ -360,9 +350,11 @@
 
 <div id="cancelBookingModalContainer"></div>
 
+<!-- jQuery (FIRST) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-
-
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -404,7 +396,7 @@
                 // ================= EXCEL =================
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="fa fa-file-excel"></i>',
+                    text: ' <i class="fa fa-file-excel"></i>',
                     className: 'btn excelBtn btn-outline-success',
 
                     title: 'My Bookings',
@@ -530,7 +522,7 @@
                 // ================= PRINT =================
                 {
                     extend: 'print',
-                    text: '<i class="fa fa-print"></i>',
+                    text: '<i class="fa-solid fa-print"></i>',
                     className: 'btn printBtn btn-outline-secondary',
 
                     title: 'My Bookings',
