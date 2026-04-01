@@ -160,13 +160,17 @@ namespace GSTAgroTourism.Controllers
             model.DiscountPercent = data.DiscountPercent;
             model.DiscountAmount = data.DiscountAmount;
             model.PackagePrice = Session["PackagePrice"] != null
-       ? Convert.ToDecimal(Session["PackagePrice"])
-       : data.PackagePrice;
+ ? Convert.ToDecimal(Session["PackagePrice"])
+ : data.PackagePrice;
 
             if (model.PackagePrice == 0)
                 model.PackagePrice = data.PackagePrice;
 
-            model.FinalPrice = model.PackagePrice;
+            model.DiscountPercent = data.DiscountPercent;
+
+            model.DiscountAmount = (model.PackagePrice * model.DiscountPercent) / 100;
+
+            model.FinalPrice = model.PackagePrice - model.DiscountAmount;
             model.NoOfGuest = data?.NoOfGuest ?? 0;
             System.Diagnostics.Debug.WriteLine("NoOfGuest from data: " + data.NoOfGuest);
             model.PayableAmount = model.FinalPrice;
