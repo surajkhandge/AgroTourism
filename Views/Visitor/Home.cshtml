@@ -346,6 +346,47 @@
             font-size: 14px;
             margin: 0;
         }
+
+    #topFarmCarousel .carousel-item {
+        transition: transform .6s ease-in-out;
+    }
+
+    .carousel-ctrl {
+        width: 50px;
+        height: 50px;
+        background: #1F4D3A;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+    }
+
+        .carousel-ctrl:hover {
+            background: #F4A300;
+        }
+
+    #topFarmCarousel .farm-card {
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #topFarmCarousel .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #topFarmCarousel .card-title {
+        min-height: 48px;
+    }
+
+    #topFarmCarousel img {
+        height: 200px;
+        object-fit: cover;
+    }
 </style>
 
 @*Search Section Start*@
@@ -545,67 +586,134 @@
         <div class="d-flex justify-content-between align-items-end mb-4">
             <h2 class="h2 fw-bold mb-0">Top Rated Stays</h2>
         </div>
-        <div class="row">
+        <div id="topFarmCarousel"
+             class="carousel slide"
+             data-bs-ride="carousel">
 
-            @foreach (var item in TopFarm)
-            {
-                <div class="col-sm-6 col-lg-3 mb-4 d-flex">
+            <div class="carousel-inner">
 
-                    <div class="card shadow-sm w-100 border-0 farm-card">
+                @{
+                    int farmcount = 0;
+                }
 
-                        <!-- IMAGE WRAPPER -->
-                        <div class="image-wrapper">
+                @if (TopFarm != null && TopFarm.Count > 0)
+                {
+                    for (int i = 0; i < TopFarm.Count; i += 4)
+                    {
 
-                            <img class="card-img-top img-fluid"
-                                 src="https://images.unsplash.com/photo-1567688040542-d9a5d079b7c0"
-                                 style="height:220px; object-fit:cover;" />
-                            <!-- Wishlist -->
-                            <button class="wishlist-btn"
-                                    data-farm="@item.FarmHouseCode"
-                                    onclick="toggleWishlist(this)">
-                                <i class="bi bi-heart"></i>
-                            </button>
+                        <div class="carousel-item @(farmcount==0?"active":"")">
 
-                            <!-- Rating Badge -->
-                            <div class="rating-badge">
-                                <i class="bi bi-star-fill"></i>
-                                @item.AvgRating
+                            <div class="row">
+
+                                @for (int j = i; j < i + 4 && j < TopFarm.Count; j++)
+                                {
+
+                                    <div class="col-lg-3 col-md-6">
+
+                                        <div class="card shadow-sm w-100 border-0 farm-card">
+
+                                            <div class="image-wrapper">
+
+                                                <img class="card-img-top"
+                                                     src="https://images.unsplash.com/photo-1567688040542-d9a5d079b7c0"
+                                                     style="height:220px;object-fit:cover;" />
+
+                                                <button class="wishlist-btn"
+                                                        data-farm="@TopFarm[j].FarmHouseCode"
+                                                        onclick="toggleWishlist(this)">
+
+                                                    <i class="bi bi-heart"></i>
+
+                                                </button>
+
+                                                <div class="rating-badge">
+
+                                                    <i class="bi bi-star-fill"></i>
+
+                                                    @TopFarm[j].AvgRating
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="card-body d-flex flex-column">
+                                                <h5 class="fw-bold">
+
+                                                    @TopFarm[j].FarmHouseName
+
+                                                </h5>
+
+                                                <p class="text-muted small">
+
+                                                    @TopFarm[j].CityName
+
+                                                </p>
+
+                                                <div class="d-flex justify-content-between">
+
+                                                    <div>
+
+                                                        <span class="fw-bold text-warning">
+
+                                                            ₹@TopFarm[j].LowestPrice
+
+                                                        </span>
+
+                                                        <small>/ night</small>
+
+                                                    </div>
+
+                                                    <a class="btn btn-outline-success"
+                                                       onclick="openFarm('@Url.Action("FarmDetailsSK","Visitor",
+new { id = TopFarm[j].FarmHouseCode })')">
+
+                                                        View Details
+
+                                                    </a>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                }
+
                             </div>
 
                         </div>
 
-                        <!-- BODY -->
-                        <div class="card-body d-flex flex-column">
+                        farmcount++;
 
-                            <h5 class="card-title fw-bold mb-1">
-                                @item.FarmHouseName
-                            </h5>
+                    }
+                }
 
-                            <p class="text-muted small mb-3">
-                                @item.CityName
-                            </p>
+            </div>
 
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
+            <div class="carousel-controls-row">
 
-                                <div>
-                                    <span class="fw-bold text-warning">
-                                        ₹@item.LowestPrice
-                                    </span>
-                                    <small class="text-muted"> / night</small>
-                                </div>
+                <button class="carousel-control-prev carousel-ctrl"
+                        type="button"
+                        data-bs-target="#topFarmCarousel"
+                        data-bs-slide="prev">
 
-                                <a class="btn btn-outline-success btn-rounded" onclick="openFarm('@Url.Action("FarmDetailsSK","Visitor", new { id = item.FarmHouseCode })') ">
-                                    View Details
-                                </a>
+                    <i class="fa-solid fa-chevron-left"></i>
 
-                            </div>
+                </button>
 
-                        </div>
+                <button class="carousel-control-next carousel-ctrl"
+                        type="button"
+                        data-bs-target="#topFarmCarousel"
+                        data-bs-slide="next">
 
-                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
 
-                </div>
-            }
+                </button>
+
+            </div>
+
         </div>
     </div>
 </section>
