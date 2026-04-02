@@ -66,9 +66,11 @@ namespace GSTAgroTourism.Controllers
                     Session["VisitorCode"] = ds.Tables[2].Rows[0]["VisitorCode"].ToString();
                     Session["VisitorName"] = ds.Tables[2].Rows[0]["FullName"].ToString();
 
-                    TempData["Login"] = "Success";
+                    TempData["Login"] = "success";
 
-                    return RedirectToAction("Home", "Visitor");
+                    TempData.Keep("Login"); 
+
+                    return RedirectToAction("Home");
                 }
 
                 // INVALID LOGIN

@@ -233,31 +233,37 @@
     <script src="~/Content/js/Visitor.js"></script>
     <script>
 
-@if(TempData["Login"]!=null)
+@if(TempData["Login"] != null)
 {
 <text>
+
 Swal.fire({
 icon:'success',
 title:'Welcome @Session["VisitorName"]',
 timer:2000,
 showConfirmButton:false
 });
+
 </text>
+
+TempData.Remove("Login");   // ⭐ ADD THIS
 }
 
-@if(TempData["Logout"]!=null)
+@if(TempData["Logout"] != null)
 {
 <text>
+
 Swal.fire({
 icon:'success',
 title:'Logout Successfully',
 timer:2000,
 showConfirmButton:false
 });
+
 </text>
+
+TempData.Remove("Logout");   // ⭐ ADD THIS
 }
-
-
 
     </script>
 </body>
