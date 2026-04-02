@@ -191,6 +191,7 @@
 
             updateSliderBackground(10000);
 
+            // important
             applyFilters();
 
         });
@@ -212,31 +213,37 @@
     }
 
 
-    function applyFilters() {
+  function applyFilters() {
 
-        let maxPrice = $("#priceRange").val();
+let maxPrice=$("#priceRange").val();
 
-        let minRating = $("input[name='rating']:checked").val();
+let minRating=$("input[name='rating']:checked").val();
 
-        $.ajax({
+let cityId='@(ViewBag.CityId ?? "")';
 
-            url: '/Visitor/FilterFarmhousesSK',
+if(cityId==="" || cityId==="undefined")
+cityId=null;
 
-            type: 'GET',
+$.ajax({
 
-            data: {
-                maxPrice: maxPrice,
-                minRating: minRating
-            },
+url:'/Visitor/FilterFarmhousesSK',
 
-            success: function (result) {
+type:'GET',
 
-                $("#farmhouseContainer").html(result);
+    data: {
+        cityId: cityId || null,
+        maxPrice: maxPrice || null,
+        minRating: minRating || null
+    },
 
-            }
+success:function(result){
 
-        });
+$("#farmhouseContainer").html(result);
 
-    }
+}
+
+});
+
+}
 
 </script>

@@ -44,20 +44,26 @@ namespace GSTAgroTourism.Controllers
 
             return View();
         }
-
         /* See All FarmhousesList */
-        public async Task<ActionResult> FarmHousesListSK()
+        public async Task<ActionResult> FarmHousesListSK(int? cityId)
         {
-            var farmhouselist = await objbalvisitor.GetAllFarmHousesSk(null, null);
-            return View("FilterFarmhousesSK", farmhouselist);
+            var data = await objbalvisitor.GetAllFarmHousesSk(null, null, cityId);
+
+            ViewBag.CityId = cityId;
+
+            return View("FilterFarmhousesSK", data);
         }
 
         /* Filter All FarmhouseList */
         [HttpGet]
-        public async Task<ActionResult> FilterFarmhousesSK(decimal? maxPrice, decimal? minRating)
+        public async Task<ActionResult> FilterFarmhousesSK(decimal? maxPrice, decimal? minRating, int? cityId)
         {
-            var farmhouselist = await objbalvisitor.GetAllFarmHousesSk(maxPrice, minRating);
+
+            var farmhouselist =
+            await objbalvisitor.GetAllFarmHousesSk(maxPrice, minRating, cityId);
+
             return PartialView("FarmHousesListSK", farmhouselist);
+
         }
 
         /* City Suggestion Dropdown in Searchbox*/
@@ -70,15 +76,15 @@ namespace GSTAgroTourism.Controllers
 
         /* To show searchResult */
         [HttpGet]
-        public async Task<ActionResult> SearchResultSK(int cityId, string checkin = null, string checkout = null)
+        public async Task<ActionResult> SearchResultSK(int cityId, string checkin, string checkout)
         {
-            if (cityId == 0)
-            {
-                return RedirectToAction("Home");
-            }
-            var farms = await objbalvisitor.GetSearchResultSK(cityId, checkin, checkout);
+            var data = await objbalvisitor.GetSearchResultSK(cityId, checkin, checkout);
 
-            return View("FilterFarmhousesSK", farms);
+            ViewBag.CityId = cityId;
+            ViewBag.CheckIn = checkin;
+            ViewBag.CheckOut = checkout;
+
+            return View("FilterFarmhousesSK", data);
         }
 
         /* Add Farmhouses To Wishlist */
@@ -138,55 +144,77 @@ namespace GSTAgroTourism.Controllers
                 return RedirectToAction("Index");
 
             string farmCode = Session["FarmCode"]?.ToString();
-            string packageCode = Session["PackageCode"]?.ToString();
             string packageName = Session["PackageName"]?.ToString();
             string checkIn = Session["CheckIn"]?.ToString();
-            int nights = Session["Nights"] != null ? Convert.ToInt32(Session["Nights"]) : 1;
+
+            int nights = Session["Nights"] != null
+                ? Convert.ToInt32(Session["Nights"]) : 1;
 
             if (farmCode == null || packageName == null)
                 return RedirectToAction("Index");
-            /* Get package summary */
+
             ConfirmBookingVM model = new ConfirmBookingVM();
-            /* Common View Model */
-            var data = await objbalvisitor.GetConfirmBookingSummarySK(farmCode, packageName);
+
+            var data = await objbalvisitor
+            .GetConfirmBookingSummarySK(farmCode, packageName);
+
             model.FarmHouseCode = data.FarmHouseCode;
             model.FarmHouseName = data.FarmHouseName;
             model.Location = data.CityName;
             model.PackageName = data.PackageName;
             model.RoomTypeName = data.RoomTypeName;
             model.MealTypeName = data.MealTypeName;
+
+            /* Guests */
             model.NoOfGuest = data.NumberOfGuests;
-            Session["NoOfGuest"] = model.NoOfGuest;
+            Session["NoOfGuest"] = data.NumberOfGuests;
+
+            /* ⭐ PRICE FIX (MOST IMPORTANT) */
+
+            // ORIGINAL PRICE (from DB)
+            model.PackagePrice = data.PackagePrice;
+
+            // DISCOUNT %
             model.DiscountPercent = data.DiscountPercent;
             model.DiscountAmount = data.DiscountAmount;
             model.PackagePrice = Session["PackagePrice"] != null
- ? Convert.ToDecimal(Session["PackagePrice"])
- : data.PackagePrice;
+       ? Convert.ToDecimal(Session["PackagePrice"])
+       : data.PackagePrice;
 
-            if (model.PackagePrice == 0)
-                model.PackagePrice = data.PackagePrice;
+            // DISCOUNT AMOUNT
+            model.DiscountAmount =
+            model.PackagePrice - model.FinalPrice;
 
-            model.DiscountPercent = data.DiscountPercent;
-
-            model.DiscountAmount = (model.PackagePrice * model.DiscountPercent) / 100;
-
-            model.FinalPrice = model.PackagePrice - model.DiscountAmount;
+            model.FinalPrice = model.PackagePrice;
             model.NoOfGuest = data?.NoOfGuest ?? 0;
             System.Diagnostics.Debug.WriteLine("NoOfGuest from data: " + data.NoOfGuest);
             model.PayableAmount = model.FinalPrice;
+
             Session["TotalAmount"] = model.FinalPrice;
+
             /* Dates */
             model.CheckIn = Convert.ToDateTime(checkIn);
+
             model.Nights = nights;
-            model.CheckOut = model.CheckIn.AddDays(nights);
+
+            model.CheckOut =
+            model.CheckIn.AddDays(nights);
 
             /* Activities */
-            var allActivities = await objbalvisitor.GetPackageActivitiesSK(farmCode);
-            var codes = string.IsNullOrEmpty(data.ActivityCode)
-                        ? new string[0]
-                        : data.ActivityCode.Split(',');
-            model.Activities = allActivities.FindAll(a => codes.Contains(a.ActivityCode));
+            var allActivities =
+            await objbalvisitor.GetPackageActivitiesSK(farmCode);
+
+            var codes =
+            string.IsNullOrEmpty(data.ActivityCode)
+            ? new string[0]
+            : data.ActivityCode.Split(',');
+
+            model.Activities =
+            allActivities.FindAll(a =>
+            codes.Contains(a.ActivityCode));
+
             model.IsPackageBooking = true;
+
             return View("ConfirmBookingSK", model);
         }
         /* Booking Session  */
