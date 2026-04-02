@@ -762,6 +762,7 @@
                             <div class="package-slide">
 
                                 <div class="package-card packageCard"
+                                     data-code="@pkg.PackageCode"
                                      data-name="@pkg.PackageName"
                                      data-price="@pkg.TotalPrice"
                                      data-days="@pkg.NoOfDays"
@@ -1003,10 +1004,10 @@ new { farmCode = Model.FarmHouseCode })"
 <script>
 
 /* ===== GLOBAL ===== */
-
-let selectedPackageName="";
-let selectedPrice="";
-let selectedDays="";
+    let selectedPackageCode = "";
+    let selectedPackageName = "";
+    let selectedPrice = "";
+    let selectedDays = "";
     let selectedNights = "";
     let selectedGuests = "";
 
@@ -1209,12 +1210,13 @@ let newOut=new Date(start);
 newOut.setDate(newOut.getDate()+nights);
 let finalOut=newOut.toISOString().split('T')[0];
 $.post('/Visitor/SetBookingSessionSK',{
-farmCode:'@Model.FarmHouseCode',
+    farmCode: '@Model.FarmHouseCode',
+  packageCode: selectedPackageCode,
 packageName:selectedPackageName,
 price:selectedPrice,
 days:selectedDays,
 nights:selectedNights,
-guests:selectedGuests,
+ guests: selectedGuests,
 checkIn:convertToISO(checkIn),
 checkOut: finalOut
 },

@@ -483,33 +483,36 @@ new { id = "guestForm", novalidate = "novalidate" }))
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<h3>Total Guests : @Model.TotalGuests</h3>
 <script>
 
 var maxGuests=@Model.TotalGuests;
 
+console.log("MaxGuests:",maxGuests);
 
-document.getElementById("addGuestBtn")
-.onclick=function(){
+if(maxGuests==0 || maxGuests==null)
+maxGuests=1;
+
+document.getElementById("addGuestBtn").onclick=function(){
 
 let container=
-document.getElementById(
-"guestContainer");
+document.getElementById("guestContainer");
 
 let count=
-container.getElementsByClassName(
-"guest-card").length;
+container.getElementsByClassName("guest-card").length;
 
 if(count>=maxGuests){
 
-Swal.fire(
-"Guest limit reached");
+Swal.fire({
+icon:'warning',
+title:'Guest limit reached',
+text:'Maximum '+maxGuests+' guests allowed'
+});
 
 return;
-
 }
 
-    let html = `
+let html = `
 
 <div class="guestcard mb-3 guest-card p-3">
 
@@ -525,7 +528,7 @@ Guest ${count + 1} Details
 
 <input name="Guests[${count}].FullName"
 class="form-control name"
-required/>
+required>
 
 <div class="error-msg"></div>
 
@@ -538,7 +541,7 @@ required/>
 <input name="Guests[${count}].Age"
 type="number"
 class="form-control age"
-required/>
+required>
 
 <div class="error-msg"></div>
 
@@ -551,7 +554,7 @@ required/>
 <input name="Guests[${count}].ContactNumber"
 class="form-control mobile"
 maxlength="10"
-required/>
+required>
 
 <div class="error-msg"></div>
 
@@ -563,7 +566,7 @@ required/>
 
 <input name="Guests[${count}].Email"
 class="form-control email"
-required/>
+required>
 
 <div class="error-msg"></div>
 
@@ -591,10 +594,15 @@ value="Others"> Others
 
 </div>
 
-</div>`;
+</div>
+
+`;
 
 container.insertAdjacentHTML(
 "beforeend",html);
+
+if(count+1>=maxGuests)
+document.getElementById("addGuestBtn").disabled=true;
 
 }
 
@@ -706,9 +714,4 @@ container.insertAdjacentHTML(
         }
 
     });
-
-    if (count + 1 >= maxGuests) {
-        document.getElementById("addGuestBtn").disabled = true;
-    }
-
 </script>

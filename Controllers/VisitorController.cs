@@ -148,7 +148,8 @@ namespace GSTAgroTourism.Controllers
             string checkIn = Session["CheckIn"]?.ToString();
 
             int nights = Session["Nights"] != null
-                ? Convert.ToInt32(Session["Nights"]) : 1;
+                ? Convert.ToInt32(Session["Nights"])
+                : 1;
 
             if (farmCode == null || packageName == null)
                 return RedirectToAction("Index");
@@ -158,41 +159,36 @@ namespace GSTAgroTourism.Controllers
             var data = await objbalvisitor
             .GetConfirmBookingSummarySK(farmCode, packageName);
 
+            // FARM DETAILS
             model.FarmHouseCode = data.FarmHouseCode;
             model.FarmHouseName = data.FarmHouseName;
             model.Location = data.CityName;
+
+            // PACKAGE DETAILS
             model.PackageName = data.PackageName;
             model.RoomTypeName = data.RoomTypeName;
             model.MealTypeName = data.MealTypeName;
 
-            /* Guests */
-            model.NoOfGuest = data.NumberOfGuests;
-            Session["NoOfGuest"] = data.NumberOfGuests;
+            // PRICE BREAKUP ⭐ IMPORTANT FIX
+            model.PackagePrice = data.PackagePrice;     // Original price
 
-            /* ⭐ PRICE FIX (MOST IMPORTANT) */
-
-            // ORIGINAL PRICE (from DB)
-            model.PackagePrice = data.PackagePrice;
-
-            // DISCOUNT %
             model.DiscountPercent = data.DiscountPercent;
-            model.DiscountAmount = data.DiscountAmount;
-            model.PackagePrice = Session["PackagePrice"] != null
-       ? Convert.ToDecimal(Session["PackagePrice"])
-       : data.PackagePrice;
 
-            // DISCOUNT AMOUNT
+            model.FinalPrice = data.TotalPrice;         // Discounted price
+
             model.DiscountAmount =
             model.PackagePrice - model.FinalPrice;
 
-            model.FinalPrice = model.PackagePrice;
-            model.NoOfGuest = data?.NoOfGuest ?? 0;
-            System.Diagnostics.Debug.WriteLine("NoOfGuest from data: " + data.NoOfGuest);
             model.PayableAmount = model.FinalPrice;
 
             Session["TotalAmount"] = model.FinalPrice;
 
-            /* Dates */
+            // GUEST COUNT ⭐ FIX
+            model.NoOfGuest = data.NumberOfGuests;
+
+            Session["NoOfGuest"] = data.NumberOfGuests;
+
+            // DATES
             model.CheckIn = Convert.ToDateTime(checkIn);
 
             model.Nights = nights;
@@ -200,7 +196,7 @@ namespace GSTAgroTourism.Controllers
             model.CheckOut =
             model.CheckIn.AddDays(nights);
 
-            /* Activities */
+            // ACTIVITIES
             var allActivities =
             await objbalvisitor.GetPackageActivitiesSK(farmCode);
 
@@ -219,16 +215,35 @@ namespace GSTAgroTourism.Controllers
         }
         /* Booking Session  */
         [HttpPost]
-        public ActionResult SetBookingSessionSK(string farmCode, string packageCode, string packageName, decimal price, int days, int nights, string checkIn, string checkOut)
+        public ActionResult SetBookingSessionSK(
+string farmCode,
+string packageCode,
+string packageName,
+decimal price,
+int days,
+int nights,
+int guests,   // ⭐ add
+string checkIn,
+string checkOut)
         {
             Session["FarmCode"] = farmCode;
+
             Session["PackageCode"] = packageCode;
+
             Session["PackageName"] = packageName;
+
             Session["PackagePrice"] = price;
+
             Session["Days"] = days;
+
             Session["Nights"] = nights;
+
             Session["CheckIn"] = checkIn;
+
             Session["CheckOut"] = checkOut;
+
+            Session["NoOfGuest"] = guests;   // ⭐ FIX
+
             return Json("ok");
 
         }
@@ -540,36 +555,63 @@ namespace GSTAgroTourism.Controllers
 
             GuestPageVH model = new GuestPageVH();
 
+            model.Guests = new List<GuestVH>();
+
             if (Session["PackageName"] != null)
             {
-
                 model.IsPackageBooking = true;
-                model.PackageName = Session["PackageName"].ToString();
-                model.PackagePrice = Convert.ToDecimal(Session["PackagePrice"]);
-                model.CheckIn = Session["CheckIn"].ToString();
-                model.CheckOut = Session["CheckOut"].ToString();
-                model.Nights = Convert.ToInt32(Session["Nights"]);
+
+                model.PackageName =
+                Session["PackageName"].ToString();
+
+                model.PackagePrice =
+                Convert.ToDecimal(Session["PackagePrice"]);
+
+                model.CheckIn =
+                Session["CheckIn"].ToString();
+
+                model.CheckOut =
+                Session["CheckOut"].ToString();
+
+                model.Nights =
+                Convert.ToInt32(Session["Nights"]);
+
                 model.TotalPrice =
                 model.PackagePrice;
+
                 model.RoomTotal =
                 model.PackagePrice;
-                model.ActivityTotal = 0;
-                model.FoodTotal = 0;
-                model.TotalGuests = 4;
 
+                model.ActivityTotal = 0;
+
+                model.FoodTotal = 0;
+
+                // ✅ MOST IMPORTANT FIX
+                model.TotalGuests =
+      Session["NoOfGuest"] != null ?
+      Convert.ToInt32(Session["NoOfGuest"]) : 1;
+                System.Diagnostics.Debug.WriteLine(
+"TotalGuests:" + model.TotalGuests);
             }
             else
             {
                 if (Session["CheckIn"] == null)
                     return RedirectToAction("SelectRoomsVH");
 
-                DateTime checkin = (DateTime)Session["CheckIn"];
-                DateTime checkout = (DateTime)Session["CheckOut"];
+                DateTime checkin =
+                (DateTime)Session["CheckIn"];
 
-                model.CheckIn = checkin.ToString("dd-MM-yyyy");
-                model.CheckOut = checkout.ToString("dd-MM-yyyy");
+                DateTime checkout =
+                (DateTime)Session["CheckOut"];
 
-                int totalDays = (checkout - checkin).Days;
+                model.CheckIn =
+                checkin.ToString("dd-MM-yyyy");
+
+                model.CheckOut =
+                checkout.ToString("dd-MM-yyyy");
+
+                int totalDays =
+                (checkout - checkin).Days;
 
                 if (totalDays <= 0)
                     totalDays = 1;
@@ -582,57 +624,66 @@ namespace GSTAgroTourism.Controllers
 
                 int totalGuests = 0;
 
-                // ================= ROOM PRICE =================
-                var rooms = Session["SelectedRooms"] as List<RoomSelectionVH>;
+                var rooms =
+                Session["SelectedRooms"]
+                as List<RoomSelectionVH>;
 
-                if (rooms != null && rooms.Count > 0)
+                if (rooms != null)
                 {
                     foreach (var room in rooms)
                     {
-                        totalRoomPrice += room.PricePerNight * room.Quantity * totalDays;
-                        totalGuests += room.Quantity * room.NumberOfGuests;
+                        totalRoomPrice +=
+                        room.PricePerNight *
+                        room.Quantity *
+                        totalDays;
+
+                        totalGuests +=
+                        room.Quantity *
+                        room.NumberOfGuests;
                     }
                 }
 
-                model.RoomTotal = totalRoomPrice;
-                model.TotalGuests = totalGuests;
+                model.RoomTotal =
+                totalRoomPrice;
 
-                // ================= ACTIVITY PRICE =================
-                var activities = Session["SelectedActivities"] as List<ActivitiesVH>;
+                model.TotalGuests =
+                totalGuests;
+
+                var activities =
+                Session["SelectedActivities"]
+                as List<ActivitiesVH>;
 
                 if (activities != null)
                 {
                     foreach (var act in activities)
                     {
                         if (act.IsSelected)
-                        {
                             totalActivityPrice += act.Price;
-                        }
                     }
                 }
 
-                //  ================= Food PRICE =================
-
-                //  ₹1000 per person per day
                 decimal foodPerPersonPerDay = 1000;
-                totalFoodPrice = foodPerPersonPerDay * totalGuests * totalDays;
 
-                // ================== FINAL TOTAL PRICE =================
+                totalFoodPrice =
+                foodPerPersonPerDay *
+                totalGuests *
+                totalDays;
 
-                model.RoomTotal = totalRoomPrice;
-                model.ActivityTotal = totalActivityPrice;
-                model.FoodTotal = totalFoodPrice;
-                model.TotalPrice = model.RoomTotal + model.ActivityTotal + model.FoodTotal;
-                model.Guests = new List<GuestVH>();
-                model.Guests.Add(new GuestVH());
-                // your custom booking code
+                model.ActivityTotal =
+                totalActivityPrice;
+
+                model.FoodTotal =
+                totalFoodPrice;
+
+                model.TotalPrice =
+                model.RoomTotal +
+                model.ActivityTotal +
+                model.FoodTotal;
 
             }
 
-            model.Guests = new List<GuestVH>();
-
-            model.Guests.Add(new GuestVH()
-            );
+            // ✅ Single place guest list init
+            model.Guests.Add(new GuestVH());
 
             return View(model);
 
@@ -698,6 +749,7 @@ namespace GSTAgroTourism.Controllers
 
                 string farmCode = Session["FarmCode"]?.ToString()
                            ?? Session["FarmHouseCode"]?.ToString();
+
                 string packageName = Session["PackageName"].ToString();
                 int nights = Convert.ToInt32(Session["Nights"]);
                 string checkIn = Session["CheckIn"].ToString();
@@ -730,9 +782,7 @@ namespace GSTAgroTourism.Controllers
                 model.PayableAmount = model.FinalPrice;
                 Session["TotalAmount"] = model.FinalPrice;
                 var allActivities = await objbalvisitor.GetPackageActivitiesSK(farmCode);
-                var codes = string.IsNullOrEmpty(data.ActivityCode)
-                            ? new string[0]
-                            : data.ActivityCode.Split(',');
+                var codes = string.IsNullOrEmpty(data.ActivityCode) ? new string[0] : data.ActivityCode.Split(',');
                 model.Activities = allActivities.FindAll(a => codes.Contains(a.ActivityCode));
                 return View("ConfirmBookingSK", model);
 
@@ -743,8 +793,6 @@ namespace GSTAgroTourism.Controllers
                 {
                     return RedirectToAction("SelectRoomsVH");
                 }
-
-
 
                 model.CheckIn = Convert.ToDateTime(Session["CheckIn"]);
                 model.CheckOut = Convert.ToDateTime(Session["CheckOut"]);
